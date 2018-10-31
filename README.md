@@ -19,7 +19,14 @@ Steps:
     *using sockets to add it to everybody's html, making sure it goes into mySQL, not refreshing
 5. creating a room: use dialog box (?) to pass info to html and mySQL
 6. room creators: temporarily kick off others, ban others from joining room
-7. private rooms: in dialog box, box to make chat room private, set 
+7. private rooms: in dialog box, box to make chat room private, set box in
+
+
+Creative Portion Ideas:
+1. delete a room that you created
+2. set a color for chat room
+3. slide into that dm
+    * https://stackoverflow.com/questions/17476294/how-to-send-a-message-to-a-particular-client-with-socket-io 
 
 Show create table shit:
 1. messages:
