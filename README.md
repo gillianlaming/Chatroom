@@ -47,3 +47,6 @@ messages | CREATE TABLE `messages` (
   `password` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`name`)
 
+  Resources:
+  1. Helpful socket overview + code. https://openclassrooms.com/en/courses/2504541-ultra-fast-applications-using-node-js/2505653-socket-io-let-s-go-to-real-time 
+

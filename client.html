@@ -5,17 +5,24 @@
       <script type ="text/javascript">
 
       var socketio = io.connect();
+      var username = prompt('What\'s your username?');
+
+      socketio.emit('little_newbie', {username:username});
+
       socketio.on("message_to_client",function(data) {
          //Append an HR thematic break and the escaped HTML of the new message
          document.getElementById("chatlog").appendChild(document.createElement("hr"));
          document.getElementById("chatlog").appendChild(document.createTextNode(data['message']));
+         
       });
 
       function sendMessage(){
          var msg = document.getElementById("message_input").value;
          socketio.emit("message_to_server", {message:msg});
       }
-
+     
+        
+      
       </script>
    </head>
    <body>
