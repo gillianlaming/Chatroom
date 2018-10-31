@@ -20,19 +20,21 @@ app.listen(3456);
 
 // Do the Socket.IO magic:
 var io = socketio.listen(app);
-io.sockets.on("connection", function(socket){
+io.sockets.on("connection", function(socket, username){
 	// This callback runs when a new Socket.IO connection is established.
     socket.on('little_newbie', function(username) {
         socket.username = username;
+        //io.sockets.emit("message_to_client",{username:data["username"] })
+        //io.sockets.emit("message_to_client", socket.username + " ")
     });
 });
 
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
-		console.log(socket.username)
-        console.log("message: "+ socket.username + data["message"]); // log it to the Node.JS output
+		//console.log(socket.username)
+        //console.log("message: "+ socket.username + data["message"]); // log it to the Node.JS output
         io.sockets.emit("message_to_client",{message:data["message"] }) // broadcast the message to other users
-        io.sockets.emit("message_to_client",{username:data["username"] })
+        
     });
         
     
