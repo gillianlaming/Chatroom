@@ -24,18 +24,17 @@ io.sockets.on("connection", function(socket){
     socket.on('little_newbie', function(username) {
 		socket.username = username;
 		console.log("hello " + socket.username);
-		io.sockets.emit("the user is " + socket.username);
-        //io.sockets.emit("message_to_client",{username:data["username"] })
-        //io.sockets.emit("message_to_client",  socket.username + " ")
+		//io.sockets.emit("message_to_client",username["user"])
     });
 	//console.log(socket.username);
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
 		//console.log(socket.username)
 		//socket.username = username;
-		console.log("hi " + socket.username);
-        console.log("message: " + data["message"]); // log it to the Node.JS output
-        io.sockets.emit("message_to_client",{message:data["message"] }) // broadcast the message to other users
+		console.log("username is global " + socket.username);
+        console.log(data["message"]); // log it to the Node.JS output
+		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users
+		
         
 	});
 });
