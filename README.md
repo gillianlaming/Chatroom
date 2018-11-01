@@ -50,3 +50,6 @@ messages | CREATE TABLE `messages` (
   Resources:
   1. Helpful socket overview + code. https://openclassrooms.com/en/courses/2504541-ultra-fast-applications-using-node-js/2505653-socket-io-let-s-go-to-real-time 
 
+  2. to connect to mysql, run this terminal command in directory of files (in instance)
+  $ npm install mysql 
+

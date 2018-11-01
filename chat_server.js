@@ -2,7 +2,8 @@
 // Require the packages we will use:
 var http = require("http"),
 	socketio = require("socket.io"),
-	fs = require("fs");
+	fs = require("fs"),
+	mysql = require('mysql');
 
 // Listen for HTTP connections.  This is essentially a miniature static file server that only serves our one file, client.html:
 var app = http.createServer(function(req, resp){
@@ -38,7 +39,16 @@ io.sockets.on("connection", function(socket){
         
 	});
 });
-        
+var con = mysql.createConnection({
+	host: "localhost",
+	user: "chatroom_user",
+	password: "chatroom_pass"
+  });
+  
+  con.connect(function(err) {
+	if (err) throw err;
+	console.log("Connected!");
+  });
     
     
 
