@@ -33,6 +33,7 @@ io.sockets.on("connection", function(socket){
 		//console.log(socket.username)
 		//socket.username = username;
 		console.log("username is global " + socket.username);
+		socket.message = data["message"];
         console.log(data["message"]); // log it to the Node.JS output
 		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users
 		
@@ -48,6 +49,11 @@ var con = mysql.createConnection({
   con.connect(function(err) {
 	if (err) throw err;
 	console.log("Connected!");
+	var sql = "INSERT INTO messages (content, user) VALUES ('socket.username', 'socket.message')";
+  	con.query(sql, function (err, result) {
+    	if (err) throw err;
+    	console.log("1 record inserted");
+  	});
   });
     
     
