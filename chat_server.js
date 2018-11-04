@@ -36,18 +36,7 @@ io.sockets.on("connection", function(socket){
     socket.on('little_newbie', function(username) {
 		socket.username = username;
 		console.log("hello " + socket.username);
-		//io.sockets.emit("message_to_client",username["user"])
-		// con.connect(function(err) {
-		// 	if (err) throw err;
-		// 	console.log("Connected!");
-		// 	var sql = "INSERT INTO messages (user) VALUES (?)";
-		// 	var value = socket.username;
-		// 	  con.query(sql, value, function (err) {
-		// 		if (err) throw err;
-		// 		console.log("1 record inserted");
-		// 	  });
-			  
-		//   });
+	
     });
 	
 	socket.on('message_to_server', function(data) {
@@ -57,7 +46,7 @@ io.sockets.on("connection", function(socket){
 		console.log("username is global " + socket.username);
 		socket.message = data["message"];
 		var sql = "INSERT INTO messages (content, user) VALUES (?)";
-		var values = [socket.message, socket.username];
+		var values = [socket.message, socket.username]; //message and username
 		  con.query(sql, [values], function (err) {
 			if (err) throw err;
 			console.log("1 record inserted");
