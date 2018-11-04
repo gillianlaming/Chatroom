@@ -23,6 +23,11 @@ var con = mysql.createConnection({
 	password: "chatroom_pass",
 	database: "chatroom"
   });
+  con.connect(function(err) {
+	if (err) throw err;
+	console.log("Connected!");
+  });
+
 app.listen(3456);
 // Do the Socket.IO magic:
 var io = socketio.listen(app);
@@ -32,32 +37,47 @@ io.sockets.on("connection", function(socket){
 		socket.username = username;
 		console.log("hello " + socket.username);
 		//io.sockets.emit("message_to_client",username["user"])
-		con.connect(function(err) {
-			if (err) throw err;
-			console.log("Connected!");
-			var sql = "INSERT INTO messages (user) VALUES (?)";
-			var value = socket.username;
-			  con.query(sql, value, function (err) {
-				if (err) throw err;
-				console.log("1 record inserted");
-			  });
+		// con.connect(function(err) {
+		// 	if (err) throw err;
+		// 	console.log("Connected!");
+		// 	var sql = "INSERT INTO messages (user) VALUES (?)";
+		// 	var value = socket.username;
+		// 	  con.query(sql, value, function (err) {
+		// 		if (err) throw err;
+		// 		console.log("1 record inserted");
+		// 	  });
 			  
-		  });
+		//   });
     });
-	//console.log(socket.username);
+	
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
 		//console.log(socket.username)
 		//socket.username = username;
 		console.log("username is global " + socket.username);
 		socket.message = data["message"];
+		var sql = "INSERT INTO messages (content, user) VALUES (?)";
+		var values = [socket.message, socket.username];
+		  con.query(sql, [values], function (err) {
+			if (err) throw err;
+			console.log("1 record inserted");
+		  });  
         console.log(data["message"]); // log it to the Node.JS output
 		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users
 		
         
 	});
+
+
+
+	
+		
+	  
+	//con.end();
+
 	
 });
+
 
   
   
