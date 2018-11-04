@@ -1,13 +1,49 @@
 <!DOCTYPE html>
 <html>
    <head>
+      <meta charset="utf-8"/>
+      <title>chatroom</title>
       <script src="/socket.io/socket.io.js"></script>
-      <script type ="text/javascript">
+      <link rel="stylesheet" href="chat.css">
+    </head>
+  
+    <body>
+      <br><br>
+      <div class="column left_column">
+        <h3>rooms:</h3>
+        <p>(click to visit)</p>
+        <ul class="list" id="rooms_list"> <!-- should load in room names -->
+          <li class="room_name"><button>{room 1}</button></li> <!-- each button activates the middle column -->
+          <li class="room_name"><button>{room 2}</button></li>
+          <li class="room_name"><button>{room 3}</button></li>
+        </ul>
+        <hr width="50%" style="margin-left: 0">
+        <button id="add_room">add a room</button>
+      </div>
+      <div class="column middle_column" id="chatroom">
+        <h1 id="room_title">this is room {name here} </h1><!-- when room is selected, append room name to this -->
+        <div id="chatlog"></div><!-- should load in previous messages in this room  -->
+        <div id="messenger">
+          <input type="text" id="message_input"/>
+          <button onclick="sendMessage()">send</button>
+        </div>
+      </div>
+      <div class="column right_column" id="chatroom">
+        <h3>users in this room:</h3>
+        <p>(click to kick out or ban)</p>
+          <ul class="list" id="users_list"> <!-- should add username once user joins room. also must broadcast change -->
+              <li class="username"><button>{user 1}</button></li> <!-- buttons so clicking will make a pop up if user owns room -->
+              <li class="username"><button>{user 2}</button></li>
+              <li class="username"><button>{user 3}</button></li>
+          </ul>
+      </div>
+   </body>
 
+   <script>
       var socketio = io.connect();
       var username = prompt('What\'s your username?');
 
-    socketio.emit('little_newbie', username);
+      socketio.emit('little_newbie', username);
       
 
       socketio.on("message_to_client",function(data) {
@@ -26,14 +62,5 @@
          //socketio.emit("message_to_server", username);
          //socketio.emit('little_newbie', {username:username});
       }
-     
-        
-      
-      </script>
-   </head>
-   <body>
-      <input type=text" id="message_input"/>
-      <button onclick="sendMessage()">send</button>
-      <div id="chatlog"></div>
-   </body>
+    </script>
 </html>
