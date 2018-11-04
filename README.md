@@ -3,6 +3,10 @@
 #ideas
 
 * opening up page, "choose a nickname" html form boxc
+Todos:
+1. figure out why css isnt working
+2. change username (gillian)
+3. use sockets to get room names from mySQL (gillian)
 
 Database:
 
@@ -52,4 +56,7 @@ messages | CREATE TABLE `messages` (
 
   2. to connect to mysql, run this terminal command in directory of files (in instance)
   $ npm install mysql 
+
+  
+
 
