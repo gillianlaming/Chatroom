@@ -23,7 +23,8 @@
           <li class="room_name"><button>{room 3}</button></li>
         </ul>
         <hr width="50%" style="margin-left: 0">
-        <button id="add_room">add a room</button>
+        <input type="text" id="room_name"/>
+        <button onclick="addRoom()" id="add_room">add a room</button>
       </div>
       <div class="column middle_column" id="chatroom">
         <h1 id="room_title">this is room {name here} </h1><!-- when room is selected, append room name to this -->
@@ -66,6 +67,10 @@
       function sendUsername(){
         var username = document.getElementById("username").value;
         socketio.emit('little_newbie', username);
+      }
+      function addRoom(){
+        var roomName = document.getElementById("room_name").value;
+        socketio.emit('get_room_name', roomName);
       }
 
       function sendMessage(){
