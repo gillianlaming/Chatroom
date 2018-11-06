@@ -68,6 +68,13 @@
         btn.onclick = function(){ //this is "entering a room"
           console.log("roomname " + roomName)
           document.getElementById("room_title").appendChild(document.createTextNode(roomName)) //displays the room name
+          var button = document.getElementById("rooms_list").appendChild(document.createElement("button"));
+          btn.appendChild(document.createTextNode("leave " + roomName));
+          btn.onclick = function(){
+            let x = document.getElementById("room_title")[]
+            document.getElementById("room_title").removeChild(2)//need to figure out how to remove this node
+            //what happens when you leave the room
+          }
           //needs to hide all the other rooms
           //needs a "leave room" button
 
