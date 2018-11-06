@@ -7,6 +7,8 @@ Todos:
 1. figure out why css isnt working
 2. change username (gillian)
 3. use sockets to get room names from mySQL (gillian)
+4. figure out why the css isnt working
+5. package.json
 
 Database:
 
