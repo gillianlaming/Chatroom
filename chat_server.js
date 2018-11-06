@@ -38,8 +38,34 @@ io.sockets.on("connection", function(socket){
 	// This callback runs when a new Socket.IO connection is established.
     socket.on('little_newbie', function(username) {
 		socket.username = username;
-		console.log("hello " + socket.username);
-	
+		var qry = "SELECT user from users";
+				con.query(qry, function(err, result, fields){
+					if (err) throw err;
+					for (var i =0; i<(result.length); ++i){
+						user1 = result[i].user;
+						socket.emit("display_users",user1) //this needs to broadcast to all users
+					}
+					//insert more things here
+			})
+		var insert = "INSERT INTO users (user) values (?)";
+		con.query(insert, socket.username, function(err){
+			if (err) throw err;
+			console.log("1 user inserted")
+		})
+		//console.log("hello " + socket.username);
+		io.sockets.emit("display_users", username);
+
+				
+		var qry = "SELECT name from rooms";
+		con.query(qry, function(err, result, fields){
+			if (err) throw err;
+			for (var i =0; i<result.length; ++i){
+				roomName = result[i].name;
+				//console.log(roomName);
+				socket.emit("room_names",roomName) //this needs to broadcast to all users
+			}
+		})
+			
     });
 	socket.on("get_room_name", function(roomName){
 		socket.roomName = roomName; //this is a session variable. we may need to change this later
@@ -69,20 +95,9 @@ io.sockets.on("connection", function(socket){
 		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users  
 	});
 
-	socket.on("on_boot", function(truth){
-		if (truth == "true"){
-		var qry = "SELECT name from rooms";
-		con.query(qry, function(err, result, fields){
-			if (err) throw err;
-			for (var i =0; i<result.length; ++i){
-				roomName = result[i].name;
-				console.log(roomName);
-				socket.emit("room_names",roomName) //this needs to broadcast to all users
-			}
-		})
-	}
-	})
-
+	
+		
+	
 
 
 
@@ -100,4 +115,4 @@ io.sockets.on("connection", function(socket){
     
     
 
-//socket.username =username;
+//socket.username =username

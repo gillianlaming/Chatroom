@@ -15,6 +15,8 @@
 
       <br><br>
       <div class="column left_column">
+        <h3>users:</h3>
+        <div id="users_list"></div>
         <h3>rooms:</h3>
         <!-- <p>(click to visit)</p> -->
         <ul class="list" id="rooms_list"> <!-- should load in room names -->
@@ -65,6 +67,11 @@
         btn.appendChild(document.createTextNode(roomName));
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
       })
+
+      socketio.on("display_users", function(username){
+        document.getElementById("users_list").appendChild(document.createTextNode(username + " "));
+        //document.getElementById("user_list").appendChild(document.createElement("br"));
+      });
       
 
       function sendUsername(){
