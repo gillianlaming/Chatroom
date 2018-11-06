@@ -41,7 +41,16 @@ io.sockets.on("connection", function(socket){
 		console.log("hello " + socket.username);
 	
     });
-	//changes
+	socket.on("get_room_name", function(roomName){
+		socket.roomName = roomName; //this is a session variable. we may need to change this later
+		console.log("roomname " + socket.roomName);
+		var sql = "INSERT INTO rooms (name, user) VALUES (?)";
+		var values = [socket.roomName, socket.username];
+		con.query(sql, [values], function (err) {
+			if (err) throw err;
+			console.log("1 record inserted");
+		  }); 
+	})
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
 		//console.log(socket.username)
