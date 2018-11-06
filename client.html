@@ -16,11 +16,9 @@
       <br><br>
       <div class="column left_column">
         <h3>rooms:</h3>
-        <p>(click to visit)</p>
+        <!-- <p>(click to visit)</p> -->
         <ul class="list" id="rooms_list"> <!-- should load in room names -->
-          <li class="room_name"><button>{room 1}</button></li> <!-- each button activates the middle column -->
-          <li class="room_name"><button>{room 2}</button></li>
-          <li class="room_name"><button>{room 3}</button></li>
+          <!-- <li class="room_name"><button>{room 1}</button></li> each button activates the middle column -->
         </ul>
         <hr width="50%" style="margin-left: 0">
         <input type="text" id="room_name"/>
@@ -62,11 +60,18 @@
          document.getElementById("chatlog").appendChild(document.createTextNode(data['message']));
          //document.getElementById("chatlog").appendChild(document.createTextNode(username['user']));
       });
+      socketio.on("room_names", function(roomName){
+        var btn = document.getElementById("rooms_list").appendChild(document.createElement("button"));
+        btn.appendChild(document.createTextNode(roomName));
+        document.getElementById("rooms_list").appendChild(document.createElement("br"));
+      })
       
 
       function sendUsername(){
+        var truth = "true";
         var username = document.getElementById("username").value;
         socketio.emit('little_newbie', username);
+        socketio.emit("on_boot", truth);
       }
       function addRoom(){
         var roomName = document.getElementById("room_name").value;

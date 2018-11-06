@@ -49,7 +49,9 @@ io.sockets.on("connection", function(socket){
 		con.query(sql, [values], function (err) {
 			if (err) throw err;
 			console.log("1 record inserted");
-		  }); 
+			}); 
+		io.sockets.emit("room_names",roomName); //send the new roomname to the html
+		
 	})
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
@@ -64,10 +66,23 @@ io.sockets.on("connection", function(socket){
 			console.log("1 record inserted");
 		  });  
         console.log(data["message"]); // log it to the Node.JS output
-		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users
-		
-        
+		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users  
 	});
+
+	socket.on("on_boot", function(truth){
+		if (truth == "true"){
+		var qry = "SELECT name from rooms";
+		con.query(qry, function(err, result, fields){
+			if (err) throw err;
+			for (var i =0; i<result.length; ++i){
+				roomName = result[i].name;
+				console.log(roomName);
+				socket.emit("room_names",roomName) //this needs to broadcast to all users
+			}
+		})
+	}
+	})
+
 
 
 
