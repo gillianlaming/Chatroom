@@ -38,6 +38,7 @@ io.sockets.on("connection", function(socket){
 	// This callback runs when a new Socket.IO connection is established.
     socket.on('little_newbie', function(username) {
 		socket.username = username;
+		//note to gillian: something is going wrong when users are entering on the printing users. one user is printing twice and idk why.
 		var qry = "SELECT user from users";
 				con.query(qry, function(err, result, fields){
 					if (err) throw err;
