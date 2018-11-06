@@ -1,0 +1,27 @@
+{
+  "name": "fall2018-module6-group-457569-457507",
+  "version": "1.0.0",
+  "description": "package for chatroom",
+  "main": "chat_server.js",
+  "dependencies": {
+    "mysql": "^2.16.0",
+    "mysqli": "^3.0.5",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://leelag999@bitbucket.org/cse330/fall2018-module6-group-457569-457507.git"
+  },
+  "keywords": [
+    "chat",
+    "room",
+    "chatroom"
+  ],
+  "author": "gillian and leela",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/cse330/fall2018-module6-group-457569-457507#readme"
+}
