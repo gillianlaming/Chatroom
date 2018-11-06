@@ -22,9 +22,9 @@ var con = mysql.createConnection({
 	host: "localhost",
 	user: "chatroom_user",
 	password: "chatroom_pass",
-	database: "chatroom",
-	socketPath: '/var/run/mysqld/mysqld.sock',
-	port: 3456
+	database: "chatroom"
+	//socketPath: '/var/run/mysqld/mysqld.sock',
+	//port: 3456
   });
   con.connect(function(err) {
 	if (err) throw err;
