@@ -41,7 +41,7 @@ io.sockets.on("connection", function(socket){
 		console.log("hello " + socket.username);
 	
     });
-	
+	//changes
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
 		//console.log(socket.username)
