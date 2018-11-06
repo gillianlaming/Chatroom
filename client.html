@@ -8,6 +8,11 @@
     </head>
 
     <body>
+      <div id="getUsername">
+          <input type="text" id="username"/>
+          <button onclick="sendUsername()">submit username</button>
+      </div>
+
       <br><br>
       <div class="column left_column">
         <h3>rooms:</h3>
@@ -41,9 +46,12 @@
 
    <script>
       var socketio = io.connect();
-      var username = prompt('What\'s your username?');
+      //var username = prompt('What\'s your username?');
 
-      socketio.emit('little_newbie', username);
+      // socketio.on("get_username",fucntion(username){
+        
+      // });
+     //git socketio.emit('little_newbie', username);
       
 
       socketio.on("message_to_client",function(data) {
@@ -53,6 +61,11 @@
          document.getElementById("chatlog").appendChild(document.createTextNode(data['message']));
          //document.getElementById("chatlog").appendChild(document.createTextNode(username['user']));
       });
+
+      function sendUsername(){
+        var username = document.getElementById("username").value;
+        socketio.emit('little_newbie', username);
+      }
 
       function sendMessage(){
          var msg = document.getElementById("message_input").value;

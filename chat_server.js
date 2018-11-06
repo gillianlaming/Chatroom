@@ -5,6 +5,7 @@ var http = require("http"),
 	fs = require("fs"),
 	mysql = require('mysql');
 
+
 // Listen for HTTP connections.  This is essentially a miniature static file server that only serves our one file, client.html:
 var app = http.createServer(function(req, resp){
 	// This callback runs when a new connection is made to our HTTP server.
@@ -21,7 +22,9 @@ var con = mysql.createConnection({
 	host: "localhost",
 	user: "chatroom_user",
 	password: "chatroom_pass",
-	database: "chatroom"
+	database: "chatroom",
+	socketPath: '/var/run/mysqld/mysqld.sock',
+	port: 3456
   });
   con.connect(function(err) {
 	if (err) throw err;
@@ -38,7 +41,7 @@ io.sockets.on("connection", function(socket){
 		console.log("hello " + socket.username);
 	
     });
-	
+	//changes
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
 		//console.log(socket.username)
@@ -74,4 +77,3 @@ io.sockets.on("connection", function(socket){
     
 
 //socket.username =username;
-

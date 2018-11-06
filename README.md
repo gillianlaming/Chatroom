@@ -7,6 +7,8 @@ Todos:
 1. figure out why css isnt working
 2. change username (gillian)
 3. use sockets to get room names from mySQL (gillian)
+4. figure out why the css isnt working
+5. package.json
 
 Database:
 
@@ -55,7 +57,13 @@ messages | CREATE TABLE `messages` (
   1. Helpful socket overview + code. https://openclassrooms.com/en/courses/2504541-ultra-fast-applications-using-node-js/2505653-socket-io-let-s-go-to-real-time 
 
   2. to connect to mysql, run this terminal command in directory of files (in instance)
-  $ npm install mysql 
+ -  $ npm install mysql, 
+ - socket.io,  
+ - npm ??
+ - curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
+ - sudo yum install -y nodejs
+ - npm install mime
+
 
   
 
