@@ -15,7 +15,7 @@
 
       <br><br>
       <div class="column left_column">
-        <h3>users:</h3>
+        <h3>Users in this room:</h3>
         <div id="users_list"></div>
         <h3>rooms:</h3>
         <!-- <p>(click to visit)</p> -->
@@ -31,7 +31,7 @@
         <div id="chatlog"></div><!-- should load in previous messages in this room  -->
         <div id="messenger">
           <input type="text" id="message_input"/>
-          <button onclick="sendMessage()">send</button>
+          <button onclick="sendMessage()">send message</button>
         </div>
       </div>
       <div class="column right_column" id="chatroom">
@@ -65,36 +65,38 @@
       socketio.on("room_names", function(roomName){
         var btn = document.getElementById("rooms_list").appendChild(document.createElement("button"));
         btn.appendChild(document.createTextNode(roomName));
-        btn.onclick = function(){ //this is "entering a room"
-          console.log("roomname " + roomName)
+        //enter a room
+        btn.onclick = function(){ 
           document.getElementById("room_title").appendChild(document.createTextNode(roomName)) //displays the room name
           var button = document.getElementById("rooms_list").appendChild(document.createElement("button"));
-          btn.appendChild(document.createTextNode("leave " + roomName));
-          btn.onclick = function(){
-            let x = document.getElementById("room_title")[]
-            document.getElementById("room_title").removeChild(2)//need to figure out how to remove this node
-            //what happens when you leave the room
-          }
+          button.appendChild(document.createTextNode("leave " + roomName)); //creates button to leave the room
+          button.onclick = leaveRoom(); 
+          socketio.emit("users_in_room", roomName);
+          //display users in a room from mysql
           //needs to hide all the other rooms
-          //needs a "leave room" button
+          //send a message
+          //get previous messages
 
       }
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
       })
 
+      
       socketio.on("display_users", function(username){
-        document.getElementById("users_list").appendChild(document.createTextNode(username + " "));
-        //document.getElementById("user_list").appendChild(document.createElement("br"));
-      });
-      
+          document.getElementById("users_list").appendChild(document.createTextNode(username + " "));
+          //document.getElementById("user_list").appendChild(document.createElement("br"));
+          });
 
-      
+
+      function leaveRoom(){ //"leaving a room function"
+            var x = document.getElementById("room_title");
+            x.remove(); //removes the name of the room from the top of the page
+      }
       
       function sendUsername(){
         var truth = "true";
         var username = document.getElementById("username").value;
         socketio.emit('little_newbie', username);
-        socketio.emit("on_boot", truth);
       }
       function addRoom(){
         var roomName = document.getElementById("room_name").value;

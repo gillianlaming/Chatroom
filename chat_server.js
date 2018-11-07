@@ -38,25 +38,25 @@ io.sockets.on("connection", function(socket){
 	// This callback runs when a new Socket.IO connection is established.
     socket.on('little_newbie', function(username) {
 		socket.username = username;
+
 		//note to gillian: something is going wrong when users are entering on the printing users. one user is printing twice and idk why.
-		var qry = "SELECT user from users";
-				con.query(qry, function(err, result, fields){
-					if (err) throw err;
-					for (var i =0; i<(result.length); ++i){
-						user1 = result[i].user;
-						socket.emit("display_users",user1) //this needs to broadcast to all users
-					}
-					//insert more things here
-			})
+
+		// var qry = "SELECT user from rooms where name = ROOMNAME"; //THIS ISNT GOING TO WORK RN
+		// 		con.query(qry, function(err, result, fields){
+		// 			if (err) throw err;
+		// 			for (var i =0; i<(result.length); ++i){
+		// 				user1 = result[i].user;
+		// 				socket.emit("display_users",user1) //displays all the users to the current user
+		// 			}
+		// 			//insert more things here
+		// 	})
+			
 		var insert = "INSERT INTO users (user) values (?)";
 		con.query(insert, socket.username, function(err){
 			if (err) throw err;
 			console.log("1 user inserted")
 		})
-		//console.log("hello " + socket.username);
-		io.sockets.emit("display_users", username);
-
-				
+		io.sockets.emit("display_users", username);	
 		var qry = "SELECT name from rooms";
 		con.query(qry, function(err, result, fields){
 			if (err) throw err;
@@ -82,8 +82,6 @@ io.sockets.on("connection", function(socket){
 	})
 	socket.on('message_to_server', function(data) {
 		// This callback runs when the server receives a new message from the client.
-		//console.log(socket.username)
-		//socket.username = username;
 		console.log("username is global " + socket.username);
 		socket.message = data["message"];
 		var sql = "INSERT INTO messages (content, user) VALUES (?)";
@@ -96,18 +94,19 @@ io.sockets.on("connection", function(socket){
 		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users  
 	});
 
-	
-		
-	
+	socket.on("users_in_room", function(roomName){
+		var name = roomName;
+		var qry = "SELECT user from users where room = 'testing'"; //FIX THIS
+				con.query(qry, function(err, result, fields){
+					if (err) throw err;
+					for (var i =0; i<(result.length); ++i){
+						user1 = result[i].user;
+						io.sockets.emit("display_users",user1) //displays all the users to the current user
+					}
+					//insert more things here
+			})
+	})
 
-
-
-	
-		
-	  
-	//con.end();
-
-	
 });
 
 
