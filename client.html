@@ -99,16 +99,19 @@
         //banning a user and kicking a user out
       }
       function leaveRoom(){ //"leaving a room function"
-            var name = document.getElementById("room_title").value;
             var x = document.getElementById("room_title");
             x.remove(); //removes the name of the room from the top of the page
             var z = document.getElementById("room_stuff");
             z.remove(); //removed the "leave + roomname" button
-
             //document.getElementById("rooms_list").style();//redisplay all of the rooms -- this is css
-
-            //remove room attribute from user in mysql
-            socketio.emit("remove_user_from_room");
+            socketio.emit("remove_user_from_room"); //remove room attribute from user in mysql
+            var y = document.getElementById("users_list").childElementCount;
+            //iterate through all of the users in the room and remove each one from the "users_list"
+            for (var i =0; i<y ; i++){
+              var baby = document.getElementById("users_list").lastElementChild;
+              baby.remove(); //remove last element
+            }
+            
       }
 
       
