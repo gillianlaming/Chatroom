@@ -10,11 +10,15 @@ Todos:
 4. figure out why the css isnt working
 5. package.json
 
-Database:
+Gillian to dos:
+- make sure users are being printed correctly after entering a room
+- when a user leaves a room the room info is removed from the sql
+- after entering a room, their messages has a room attribute in the sql
+- after entering a room, all the old messages will be printed (how to have scroll bar?)
 
-*tables: rooms, messages, 
-*room: id (primary key), name, creator, members(?)
-*meesages: id (primary), content, timestamp, user, room (foreign key)
+later to dos:
+- rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
+- room creators can be banned from room
 
 Steps:
 1. display all existing rooms

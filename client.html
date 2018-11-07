@@ -66,8 +66,9 @@
         //enter a room
         btn.onclick = function(){ 
           //leave room button isnt displaying
-          document.getElementById("room_title").appendChild(document.createTextNode(roomName)); //displays the room name WHY?? IT USED TO WORK!!
-          var button = document.getElementById("rooms_stuff").appendChild(document.createElement("button"));
+          document.getElementById("room_title").appendChild(document.createTextNode(roomName)); //displays the room name 
+          var button = document.getElementById("room_stuff").appendChild(document.createElement("button")); //now this isnt working
+          //var button = document.getElementById("rooms_stuff").appendChild(document.createElement("button"));
           button.appendChild(document.createTextNode("leave " + roomName)); //creates button to leave the room
           button.onclick = leaveRoom(); 
           var username = document.getElementById("username").value;
