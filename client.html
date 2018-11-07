@@ -63,16 +63,18 @@
          //document.getElementById("chatlog").appendChild(document.createTextNode(username['user']));
       });
       socketio.on("room_names", function(roomName){
-        var btn = document.getElementById("rooms_list").appendChild(document.createElement("button"));
+        var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); 
         btn.appendChild(document.createTextNode(roomName));
         //enter a room
         btn.onclick = function(){ 
-          document.getElementById("room_title").appendChild(document.createTextNode(roomName)) //displays the room name
+          document.getElementById("room_title").appendChild(document.createTextNode(roomName)); //displays the room name WHY IT USED TO WORK!!
           var button = document.getElementById("rooms_list").appendChild(document.createElement("button"));
           button.appendChild(document.createTextNode("leave " + roomName)); //creates button to leave the room
           button.onclick = leaveRoom(); 
+          var username = document.getElementById("username").value;
+          socketio.emit("add_user_to_room", roomName); //this could be really wrong! haha make sure this is the user whose tab is open
           socketio.emit("users_in_room", roomName);
-          //display users in a room from mysql
+          
           //needs to hide all the other rooms
           //send a message
           //get previous messages

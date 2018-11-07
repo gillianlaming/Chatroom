@@ -56,7 +56,7 @@ io.sockets.on("connection", function(socket){
 			if (err) throw err;
 			console.log("1 user inserted")
 		})
-		io.sockets.emit("display_users", username);	
+		//io.sockets.emit("display_users", username);	
 		var qry = "SELECT name from rooms";
 		con.query(qry, function(err, result, fields){
 			if (err) throw err;
@@ -96,8 +96,9 @@ io.sockets.on("connection", function(socket){
 
 	socket.on("users_in_room", function(roomName){
 		var name = roomName;
-		var qry = "SELECT user from users where room = 'testing'"; //FIX THIS
-				con.query(qry, function(err, result, fields){
+		var qry = ("SELECT user from users where room = ?") //FIX THIS
+		var values = roomName;
+				con.query(qry, [values], function(err, result, fields){
 					if (err) throw err;
 					for (var i =0; i<(result.length); ++i){
 						user1 = result[i].user;
@@ -105,6 +106,16 @@ io.sockets.on("connection", function(socket){
 					}
 					//insert more things here
 			})
+	})
+
+	socket.on("add_user_to_room", function(roomName){
+		console.log(socket.username);
+		var sql = "UPDATE users SET room = 'testing' WHERE user = 'the'"; //FIX THIS
+		//var values = [roomName, socket.username];
+		con.query(sql, function (err) {
+			if (err) throw err;
+			console.log("1 record updated");
+		  }); 
 	})
 
 });
