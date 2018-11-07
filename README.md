@@ -41,17 +41,26 @@ messages | CREATE TABLE `messages` (
   `content` mediumtext NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user` varchar(255) NOT NULL,
-  `room_name` varchar(255) NOT NULL,
+  `room_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `room_name` (`room_name`),
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`room_name`) REFERENCES `rooms` (`name`)
 
   2. ---+
-| rooms | CREATE TABLE `rooms` (
+|rooms | CREATE TABLE `rooms` (
   `name` varchar(255) NOT NULL,
   `messages` mediumtext NOT NULL,
   `password` varchar(255) DEFAULT NULL,
+  `user` varchar(255) NOT NULL,
   PRIMARY KEY (`name`)
+
+3. 
+  users | CREATE TABLE `users` (
+  `user` varchar(255) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `room` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=latin1 |
 
   Resources:
   1. Helpful socket overview + code. https://openclassrooms.com/en/courses/2504541-ultra-fast-applications-using-node-js/2505653-socket-io-let-s-go-to-real-time 
