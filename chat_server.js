@@ -71,8 +71,9 @@ io.sockets.on("connection", function(socket){
 		// This callback runs when the server receives a new message from the client.
 		console.log("username is global " + socket.username);
 		socket.message = data["message"];
-		var sql = "INSERT INTO messages (content, user) VALUES (?)";
-		var values = [socket.message, socket.username]; //message and username
+		console.log("current room " + roomName); //a little unclear where roomName is coming from, but it's working
+		var sql = "INSERT INTO messages (content, user, room_name) VALUES (?)";
+		var values = [socket.message, socket.username, roomName]; //message and username
 		  con.query(sql, [values], function (err) {
 			if (err) throw err;
 			console.log("1 record inserted");
@@ -80,7 +81,7 @@ io.sockets.on("connection", function(socket){
         console.log(data["message"]); // log it to the Node.JS output
 		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users  
 	});
-
+	
 	socket.on("users_in_room", function(roomName){
 		var name = roomName;
 		var qry = ("SELECT user from users where room = ?") //FIX THIS

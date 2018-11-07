@@ -77,6 +77,8 @@
           //we also need to hide the other rooms, css thing
 
           //send a message
+          //we need to display 
+          //document.getElementById("messenger").style(NOT HIDDEN)
           //get previous messages
 
       }
@@ -103,7 +105,10 @@
             x.remove(); //removes the name of the room from the top of the page
             var z = document.getElementById("room_stuff");
             z.remove(); //removed the "leave + roomname" button
+
+            //LEELA
             //document.getElementById("rooms_list").style();//redisplay all of the rooms -- this is css
+
             socketio.emit("remove_user_from_room"); //remove room attribute from user in mysql
             var y = document.getElementById("users_list").childElementCount;
             //iterate through all of the users in the room and remove each one from the "users_list"
@@ -120,7 +125,10 @@
         var truth = "true";
         var username = document.getElementById("username").value;
         socketio.emit('little_newbie', username);
+        //LEELA, css: stop displaying this part of the page so they can't re-enter (fixes bug, but like not actually haha)
+        //document.getElementById("getUsername").style();
       }
+
       function addRoom(){
         var roomName = document.getElementById("room_name").value;
         socketio.emit('get_room_name', roomName);
@@ -128,9 +136,11 @@
 
       function sendMessage(){
          var msg = document.getElementById("message_input").value;
+         var roomName = document.getElementById("room_title").textContent;
+         console.log("roomname " + roomName);
          //var username = prompt('What\'s your username?');
         //console.log(username);
-         socketio.emit("message_to_server", {message:msg});
+         socketio.emit("message_to_server", {message:msg}, {roomName:roomName});
          //socketio.emit("message_to_server", username);
          //socketio.emit('little_newbie', {username:username});
       }

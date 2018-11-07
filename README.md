@@ -12,10 +12,9 @@ Todos:
 6. if a user's username isn't unique, there will be hella errors (throw error?)
 
 Gillian to dos:
-- make sure users are being printed correctly after entering a room
-- when a user leaves a room the room info is removed from the sql
 - after entering a room, their messages has a room attribute in the sql
 - after entering a room, all the old messages will be printed (how to have scroll bar?)
+- a user cannot re-enter chat room with a different username otherwise things will not work (fix - stop displaying submit username shit)
 
 later to dos:
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
