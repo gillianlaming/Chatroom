@@ -40,16 +40,6 @@ io.sockets.on("connection", function(socket){
 		socket.username = username;
 
 		//note to gillian: something is going wrong when users are entering on the printing users. one user is printing twice and idk why.
-
-		// var qry = "SELECT user from rooms where name = ROOMNAME"; //THIS ISNT GOING TO WORK RN
-		// 		con.query(qry, function(err, result, fields){
-		// 			if (err) throw err;
-		// 			for (var i =0; i<(result.length); ++i){
-		// 				user1 = result[i].user;
-		// 				socket.emit("display_users",user1) //displays all the users to the current user
-		// 			}
-		// 			//insert more things here
-		// 	})
 			
 		var insert = "INSERT INTO users (user) values (?)";
 		con.query(insert, socket.username, function(err){

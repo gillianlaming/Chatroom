@@ -22,8 +22,13 @@
         <ul class="list" id="rooms_list"> <!-- should load in room names -->
           <!-- <li class="room_name"><button>{room 1}</button></li> each button activates the middle column -->
         </ul>
+        <div class = "i_hate+computer_science" id="room_stuff">
+
+        </div>
+        
         <hr width="50%" style="margin-left: 0">
         <input type="text" id="room_name"/>
+        
         <button onclick="addRoom()" id="add_room">add a room</button>
       </div>
       <div class="column middle_column" id="chatroom">
@@ -47,14 +52,7 @@
 
    <script>
       var socketio = io.connect();
-      //var username = prompt('What\'s your username?');
-
-      // socketio.on("get_username",fucntion(username){
-        
-      // });
-     //git socketio.emit('little_newbie', username);
       
-
       socketio.on("message_to_client",function(data) {
          //Append an HR thematic break and the escaped HTML of the new message
          document.getElementById("chatlog").appendChild(document.createElement("hr"));
@@ -67,15 +65,17 @@
         btn.appendChild(document.createTextNode(roomName));
         //enter a room
         btn.onclick = function(){ 
-          document.getElementById("room_title").appendChild(document.createTextNode(roomName)); //displays the room name WHY IT USED TO WORK!!
-          var button = document.getElementById("rooms_list").appendChild(document.createElement("button"));
+          //leave room button isnt displaying
+          document.getElementById("room_title").appendChild(document.createTextNode(roomName)); //displays the room name WHY?? IT USED TO WORK!!
+          var button = document.getElementById("rooms_stuff").appendChild(document.createElement("button"));
           button.appendChild(document.createTextNode("leave " + roomName)); //creates button to leave the room
           button.onclick = leaveRoom(); 
           var username = document.getElementById("username").value;
           socketio.emit("add_user_to_room", roomName); //this could be really wrong! haha make sure this is the user whose tab is open
           socketio.emit("users_in_room", roomName);
+          //document.getElementById("rooms_list").style(); //leela sos
           
-          //needs to hide all the other rooms
+          
           //send a message
           //get previous messages
 
@@ -94,6 +94,8 @@
             var x = document.getElementById("room_title");
             x.remove(); //removes the name of the room from the top of the page
       }
+
+      
       
       function sendUsername(){
         var truth = "true";
