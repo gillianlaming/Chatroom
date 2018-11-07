@@ -9,6 +9,7 @@ Todos:
 3. use sockets to get room names from mySQL (gillian)
 4. figure out why the css isnt working
 5. package.json
+6. if a user's username isn't unique, there will be hella errors (throw error?)
 
 Gillian to dos:
 - make sure users are being printed correctly after entering a room

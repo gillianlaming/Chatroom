@@ -65,18 +65,17 @@
         btn.appendChild(document.createTextNode(roomName));
         //enter a room
         btn.onclick = function(){ 
-          //leave room button isnt displaying
-          document.getElementById("room_title").appendChild(document.createTextNode(roomName)); //displays the room name 
+          document.getElementById("room_title").appendChild(document.createTextNode(roomName));//displays the room name 
           var button = document.getElementById("room_stuff").appendChild(document.createElement("button")); //now this isnt working
-          //var button = document.getElementById("rooms_stuff").appendChild(document.createElement("button"));
           button.appendChild(document.createTextNode("leave " + roomName)); //creates button to leave the room
-          button.onclick = leaveRoom(); 
-          var username = document.getElementById("username").value;
+          button.onclick = function(){
+            leaveRoom();
+          } 
           socketio.emit("add_user_to_room", roomName); //this could be really wrong! haha make sure this is the user whose tab is open
           socketio.emit("users_in_room", roomName);
           //document.getElementById("rooms_list").style(); //leela sos
-          
-          
+          //we also need to hide the other rooms, css thing
+
           //send a message
           //get previous messages
 
@@ -84,16 +83,32 @@
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
       })
 
-      
+      //once a user enters a room, display all the users in that room
       socketio.on("display_users", function(username){
-          document.getElementById("users_list").appendChild(document.createTextNode(username + " "));
-          //document.getElementById("user_list").appendChild(document.createElement("br"));
+          var usrbtn = document.getElementById("users_list").appendChild(document.createElement("button"));
+          usrbtn.onclick = function(){
+            userOptions()
+          };
+          usrbtn.appendChild(document.createTextNode(username + " "));
+          
           });
 
 
+      function userOptions(){
+        console.log("user options")
+        //banning a user and kicking a user out
+      }
       function leaveRoom(){ //"leaving a room function"
+            var name = document.getElementById("room_title").value;
             var x = document.getElementById("room_title");
             x.remove(); //removes the name of the room from the top of the page
+            var z = document.getElementById("room_stuff");
+            z.remove(); //removed the "leave + roomname" button
+
+            //document.getElementById("rooms_list").style();//redisplay all of the rooms -- this is css
+
+            //remove room attribute from user in mysql
+            socketio.emit("remove_user_from_room");
       }
 
       

@@ -37,10 +37,7 @@ var io = socketio.listen(app);
 io.sockets.on("connection", function(socket){
 	// This callback runs when a new Socket.IO connection is established.
     socket.on('little_newbie', function(username) {
-		socket.username = username;
-
-		//note to gillian: something is going wrong when users are entering on the printing users. one user is printing twice and idk why.
-			
+		socket.username = username;			
 		var insert = "INSERT INTO users (user) values (?)";
 		con.query(insert, socket.username, function(err){
 			if (err) throw err;
@@ -99,10 +96,17 @@ io.sockets.on("connection", function(socket){
 	})
 
 	socket.on("add_user_to_room", function(roomName){
-		console.log(socket.username);
-		var sql = "UPDATE users SET room = 'testing' WHERE user = 'the'"; //FIX THIS
+		var sql = "UPDATE users SET room = 'testing' WHERE user = ?"; //FIX THIS, mysql syntax error
 		//var values = [roomName, socket.username];
-		con.query(sql, function (err) {
+		con.query(sql, socket.username, function (err) {
+			if (err) throw err;
+			console.log("1 record updated");
+		  }); 
+	})
+
+	socket.on("remove_user_from_room", function(){
+		var sql = "UPDATE users SET room = 'NULL' WHERE user = ?";
+		con.query(sql, socket.username, function (err) {
 			if (err) throw err;
 			console.log("1 record updated");
 		  }); 
