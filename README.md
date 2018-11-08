@@ -1,29 +1,25 @@
 # README #
 
-#ideas
+###Todos:
 
-* opening up page, "choose a nickname" html form boxc
-Todos:
-
-4. figure out why the css isnt working
-5. package.json
-6. if a user's username isn't unique, there will be hella errors (throw error?)
-
-Gillian to dos:
-- after entering a room, get old messages from sql & display them correctly
+######Gillian:
+-  if a user's username isn't unique, there will be hella errors (throw error?)
 - a user cannot re-enter chat room with a different username otherwise things will not work (fix - stop displaying submit username shit)
 - try things in separate tabs
-- theres a lot of css work that needs to be done
+
+######Leela:
+- after entering a room, get old messages from sql & display them correctly (i'll do this bc it involves sql)
+- theres a lot of css work that needs to be done (displaying / hiding shit)
 
 
-later to dos:
+######later to dos:
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
 - room creators can ban people from rooms
 - also temporarily block
 - make it so that you don't have to delete text from message box after you send a message
 - rooms can be private
 
-Steps:
+######Steps:
 1. display all existing rooms
 2. rooms are clickable, onclick shows us the chat/messages
 3. user sets nickname when they first enter the room --socket will store the nickname, can also broadcast to everyone when a new person has joined
@@ -34,52 +30,14 @@ Steps:
 6. room creators: temporarily kick off others, ban others from joining room
 7. private rooms: in dialog box, box to make chat room private, set box in
 
-
-Creative Portion Ideas:
+######Creative Portion Ideas:
 1. delete a room that you created
 2. set a color for chat room
 3. slide into that dm
     * https://stackoverflow.com/questions/17476294/how-to-send-a-message-to-a-particular-client-with-socket-io 
 
-Show create table shit:
-1. messages:
-messages | CREATE TABLE `messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `content` mediumtext NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `user` varchar(255) NOT NULL,
-  `room_name` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `room_name` (`room_name`),
-  CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`room_name`) REFERENCES `rooms` (`name`)
-
-  2. ---+
-|rooms | CREATE TABLE `rooms` (
-  `name` varchar(255) NOT NULL,
-  `messages` mediumtext NOT NULL,
-  `password` varchar(255) DEFAULT NULL,
-  `user` varchar(255) NOT NULL,
-  PRIMARY KEY (`name`)
-
-3. 
-  users | CREATE TABLE `users` (
-  `user` varchar(255) NOT NULL,
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `room` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=latin1 |
-
-  Resources:
+####Resources:
   1. Helpful socket overview + code. https://openclassrooms.com/en/courses/2504541-ultra-fast-applications-using-node-js/2505653-socket-io-let-s-go-to-real-time 
-
-  2. to connect to mysql, run this terminal command in directory of files (in instance)
- -  $ npm install mysql, 
- - socket.io,  
- - npm ??
- - curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
- - sudo yum install -y nodejs
- - npm install mime
-
 
   
 
