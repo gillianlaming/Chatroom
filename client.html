@@ -5,6 +5,18 @@
       <title>chatroom</title>
       <script src="/socket.io/socket.io.js"></script>
       <link rel="stylesheet" href="public/chat.css">
+      <style>
+        /* h3 {visibility: hidden} */
+        #theChatroom {
+          visibility: hidden
+          }
+        #messenger {
+          visibility: hidden;
+        }
+        #h3 {
+          visibility: hidden;
+        }
+      </style>
     </head>
 
     <body>
@@ -12,24 +24,28 @@
           <input type="text" id="username"/>
           <button onclick="sendUsername()">submit username</button>
       </div>
-
+      <div id="theChatroom">
       <br><br>
       <div class="column left_column"> 
+        
         <h3>Users in this room:</h3>
         <div id="users_list"></div>
-        <h3>rooms:</h3>
+        
+        
         <!-- <p>(click to visit)</p> -->
         <ul class="list" id="rooms_list"> <!-- should load in room names -->
+          <h3>rooms:</h3>
           <!-- <li class="room_name"><button>{room 1}</button></li> each button activates the middle column -->
         </ul>
         <div class = "i_hate+computer_science" id="room_stuff">
 
         </div>
-        
+       <div id="new_room_stuff">
         <hr width="50%" style="margin-left: 0">
         <input type="text" id="room_name"/>
         <button onclick="addRoom()" id="add_room">add a room</button>
         <input type="checkbox" id="private">private room</div>
+        </div>
       </div>
 
       <div class="column middle_column" id="chatroom">
@@ -40,16 +56,8 @@
           <button onclick="sendMessage()">send message</button>
         </div>
       </div>
-      <!-- i'm not using this part at all so i figured i'd just comment it out -->
-      <!-- <div class="column right_column" id="chatroom">
-        <h3>users in this room:</h3>
-        <p>(click to kick out or ban)</p>
-          <ul class="list" id="users_list"> 
-              <li class="username"><button>{user 1}</button></li> 
-              <li class="username"><button>{user 2}</button></li>
-              <li class="username"><button>{user 3}</button></li>
-          </ul>
-      </div> -->
+    </div>
+
    </body>
 
    <script>
@@ -58,9 +66,7 @@
       socketio.on("message_to_client",function(data) {
          //Append an HR thematic break and the escaped HTML of the new message
          document.getElementById("chatlog").appendChild(document.createElement("hr"));
-         //document.getElementById("chatlog").appendChild(document.createTextNode(data['username']));
          document.getElementById("chatlog").appendChild(document.createTextNode(data['message']));
-         //document.getElementById("chatlog").appendChild(document.createTextNode(username['user']));
       });
 
       socketio.on("room_names", function(roomName){
@@ -79,10 +85,11 @@
           socketio.emit("users_in_room", roomName); //display all of the current users in the room
           socketio.emit("messages_in_room", roomName); //display all the old messages when the user enters
 
-          //document.getElementById("rooms_list").style(); //css leela, we need to make it so elements under "room list" don't show
-
-          //document.getElementById("messenger").style(NOT HIDDEN), we're gonna hide messenger until a user enters a room, so now we need to make it not hidden
-
+          //document.getElementsByTagNameNS("h3").style.visibility="visible";
+          document.getElementById("rooms_list").style.visibility="hidden"; //css leela, we need to make it so elements under "room list" don't show
+          document.getElementById("messenger").style.visibility = "visible"; //we're gonna hide messenger until a user enters a room, so now we need to make it not hidden
+          document.getElementById("new_room_stuff").style.visibility = "hidden"; //can't add a new room when you're still in a room
+         // document.getElementsByTagName("h3").style.visibility = "visible";
         }
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
       })
@@ -109,7 +116,7 @@
             z.remove(); //removes the "leave + roomname" button
 
             //LEELA
-            //document.getElementById("rooms_list").style();//redisplay all of the rooms when a user leaves
+            document.getElementById("rooms_list").style.visibility = "visible";//redisplay all of the rooms when a user leaves
 
             socketio.emit("remove_user_from_room"); //remove room attribute from user in mysql
             var y = document.getElementById("users_list").childElementCount; //number of rooms in the chatroom
@@ -124,8 +131,9 @@
         var username = document.getElementById("username").value; //get the entered value of the username
         socketio.emit('little_newbie', username); //send the username to server
 
-        //LEELA, css: stop displaying this part of the page so they can't re-enter (fixes bug, but like not actually haha)
-        //document.getElementById("getUsername").style();
+        //stop displaying this part of the page so they can't re-enter (fixes bug, but like not actually haha)
+        document.getElementById("getUsername").style.visibility = "hidden";
+        document.getElementById("theChatroom").style.visibility = "visible";
       }
 
       function addRoom(){

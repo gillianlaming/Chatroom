@@ -6,6 +6,8 @@
 -  if a user's username isn't unique, there will be hella errors (throw error?)
 - a user cannot re-enter chat room with a different username otherwise things will not work (fix - stop displaying submit username shit)
 - try things in separate tabs
+- if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
+- after a user joins and leaves a room, can't enter another room
 
 ######Leela:
 - after entering a room, get old messages from sql & display them correctly (i'll do this bc it involves sql)
@@ -33,7 +35,7 @@
 ######Creative Portion Ideas:
 1. delete a room that you created
 2. set a color for chat room
-3. slide into that dm
+3. slide into that dm SAD! we already have to do this!! :( 
     * https://stackoverflow.com/questions/17476294/how-to-send-a-message-to-a-particular-client-with-socket-io 
 
 ####Resources:

@@ -94,7 +94,7 @@ io.sockets.on("connection", function(socket){ // This callback runs when a new S
 	})
 
 	socket.on("add_user_to_room", function(roomName){
-		var sql = "UPDATE users SET room = 'testing' WHERE user = ?"; //FIX THIS, mysql syntax error
+		var sql = "UPDATE users SET room = 'new' WHERE user = ?"; //FIX THIS, mysql syntax error
 		//var values = [roomName, socket.username];
 		con.query(sql, socket.username, function (err) {
 			if (err) throw err;
