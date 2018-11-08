@@ -12,13 +12,16 @@ Todos:
 6. if a user's username isn't unique, there will be hella errors (throw error?)
 
 Gillian to dos:
-- after entering a room, their messages has a room attribute in the sql
-- after entering a room, all the old messages will be printed (how to have scroll bar?)
+- after entering a room, get old messages from sql & display them correctly
 - a user cannot re-enter chat room with a different username otherwise things will not work (fix - stop displaying submit username shit)
+- try things in separate tabs
+- theres a lot of css work that needs to be done
+
 
 later to dos:
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
-- room creators can be banned from room
+- room creators can ban people from rooms
+- also temporarily block
 
 Steps:
 1. display all existing rooms
