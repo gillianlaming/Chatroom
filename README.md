@@ -4,9 +4,7 @@
 
 * opening up page, "choose a nickname" html form boxc
 Todos:
-1. figure out why css isnt working
-2. change username (gillian)
-3. use sockets to get room names from mySQL (gillian)
+
 4. figure out why the css isnt working
 5. package.json
 6. if a user's username isn't unique, there will be hella errors (throw error?)
@@ -22,6 +20,8 @@ later to dos:
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
 - room creators can ban people from rooms
 - also temporarily block
+- make it so that you don't have to delete text from message box after you send a message
+- rooms can be private
 
 Steps:
 1. display all existing rooms

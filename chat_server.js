@@ -8,8 +8,7 @@ var http = require("http"),
 
 // Listen for HTTP connections.  This is essentially a miniature static file server that only serves our one file, client.html:
 var app = http.createServer(function(req, resp){
-	// This callback runs when a new connection is made to our HTTP server.
-	
+	// This callback runs when a new connection is made to our HTTP server
 	fs.readFile("client.html", function(err, data){
 		// This callback runs when the client.html file has been read from the filesystem.
 		
@@ -18,32 +17,30 @@ var app = http.createServer(function(req, resp){
 		resp.end(data);
 	});
 });
+
 var con = mysql.createConnection({
 	host: "localhost",
 	user: "chatroom_user",
 	password: "chatroom_pass",
 	database: "chatroom"
-	//socketPath: '/var/run/mysqld/mysqld.sock',
-	//port: 3456
-  });
+});
   con.connect(function(err) {
 	if (err) throw err;
 	console.log("Connected!");
   });
-
 app.listen(3456);
-// Do the Socket.IO magic:
+
 var io = socketio.listen(app);
-io.sockets.on("connection", function(socket){
-	// This callback runs when a new Socket.IO connection is established.
-    socket.on('little_newbie', function(username) {
-		socket.username = username;			
-		var insert = "INSERT INTO users (user) values (?)";
+io.sockets.on("connection", function(socket){ // This callback runs when a new Socket.IO connection is established.
+
+    socket.on('little_newbie', function(username) { //don't ask me why this is called little_newbie
+		socket.username = username;			//set username as a session var
+		var insert = "INSERT INTO users (user) values (?)"; //insert the user into the user table
 		con.query(insert, socket.username, function(err){
 			if (err) throw err;
 			console.log("1 user inserted")
 		})
-		//io.sockets.emit("display_users", username);	
+
 		var qry = "SELECT name from rooms";
 		con.query(qry, function(err, result, fields){
 			if (err) throw err;
@@ -115,10 +112,3 @@ io.sockets.on("connection", function(socket){
 
 });
 
-
-  
-  
-    
-    
-
-//socket.username =username

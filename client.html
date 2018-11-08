@@ -14,7 +14,7 @@
       </div>
 
       <br><br>
-      <div class="column left_column">
+      <div class="column left_column"> 
         <h3>Users in this room:</h3>
         <div id="users_list"></div>
         <h3>rooms:</h3>
@@ -28,26 +28,28 @@
         
         <hr width="50%" style="margin-left: 0">
         <input type="text" id="room_name"/>
-        
         <button onclick="addRoom()" id="add_room">add a room</button>
+        <input type="checkbox" id="private">private room</div>
       </div>
+
       <div class="column middle_column" id="chatroom">
         <h1 id="room_title"></h1><!-- when room is selected, append room name to this -->
         <div id="chatlog"></div><!-- should load in previous messages in this room  -->
-        <div id="messenger">
+        <div id="messenger"> <!--this needs to be hidden at first-->
           <input type="text" id="message_input"/>
           <button onclick="sendMessage()">send message</button>
         </div>
       </div>
-      <div class="column right_column" id="chatroom">
+      <!-- i'm not using this part at all so i figured i'd just comment it out -->
+      <!-- <div class="column right_column" id="chatroom">
         <h3>users in this room:</h3>
         <p>(click to kick out or ban)</p>
-          <ul class="list" id="users_list"> <!-- should add username once user joins room. also must broadcast change -->
-              <li class="username"><button>{user 1}</button></li> <!-- buttons so clicking will make a pop up if user owns room -->
+          <ul class="list" id="users_list"> 
+              <li class="username"><button>{user 1}</button></li> 
               <li class="username"><button>{user 2}</button></li>
               <li class="username"><button>{user 3}</button></li>
           </ul>
-      </div>
+      </div> -->
    </body>
 
    <script>
@@ -60,28 +62,28 @@
          document.getElementById("chatlog").appendChild(document.createTextNode(data['message']));
          //document.getElementById("chatlog").appendChild(document.createTextNode(username['user']));
       });
+
       socketio.on("room_names", function(roomName){
-        var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); 
+        var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
         btn.appendChild(document.createTextNode(roomName));
-        //enter a room
+
+        //ENTER ROOM 
         btn.onclick = function(){ 
           document.getElementById("room_title").appendChild(document.createTextNode(roomName));//displays the room name 
-          var button = document.getElementById("room_stuff").appendChild(document.createElement("button")); //now this isnt working
-          button.appendChild(document.createTextNode("leave " + roomName)); //creates button to leave the room
+          var button = document.getElementById("room_stuff").appendChild(document.createElement("button")); //creates button to leave the room
+          button.appendChild(document.createTextNode("leave " + roomName)); 
           button.onclick = function(){
             leaveRoom();
           } 
-          socketio.emit("add_user_to_room", roomName); //this could be really wrong! haha make sure this is the user whose tab is open
-          socketio.emit("users_in_room", roomName);
-          //document.getElementById("rooms_list").style(); //leela sos
-          //we also need to hide the other rooms, css thing
+          socketio.emit("add_user_to_room", roomName); //add current user to room in sql
+          socketio.emit("users_in_room", roomName); //display all of the current users in the room
+          socketio.emit("messages_in_room", roomName); //display all the old messages when the user enters
 
-          //send a message
-          //we need to display 
-          //document.getElementById("messenger").style(NOT HIDDEN)
-          //get previous messages
+          //document.getElementById("rooms_list").style(); //css leela, we need to make it so elements under "room list" don't show
 
-      }
+          //document.getElementById("messenger").style(NOT HIDDEN), we're gonna hide messenger until a user enters a room, so now we need to make it not hidden
+
+        }
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
       })
 
@@ -89,60 +91,58 @@
       socketio.on("display_users", function(username){
           var usrbtn = document.getElementById("users_list").appendChild(document.createElement("button"));
           usrbtn.onclick = function(){
-            userOptions()
+            userOptions() //will be able to block an ban users, report users
           };
           usrbtn.appendChild(document.createTextNode(username + " "));
           
           });
 
-
+      //banning a user and kicking a user out
       function userOptions(){
-        console.log("user options")
-        //banning a user and kicking a user out
+        console.log("user options")  
       }
-      function leaveRoom(){ //"leaving a room function"
+
+      function leaveRoom(){ 
             var x = document.getElementById("room_title");
             x.remove(); //removes the name of the room from the top of the page
             var z = document.getElementById("room_stuff");
-            z.remove(); //removed the "leave + roomname" button
+            z.remove(); //removes the "leave + roomname" button
 
             //LEELA
-            //document.getElementById("rooms_list").style();//redisplay all of the rooms -- this is css
+            //document.getElementById("rooms_list").style();//redisplay all of the rooms when a user leaves
 
             socketio.emit("remove_user_from_room"); //remove room attribute from user in mysql
-            var y = document.getElementById("users_list").childElementCount;
+            var y = document.getElementById("users_list").childElementCount; //number of rooms in the chatroom
             //iterate through all of the users in the room and remove each one from the "users_list"
             for (var i =0; i<y ; i++){
               var baby = document.getElementById("users_list").lastElementChild;
               baby.remove(); //remove last element
-            }
-            
+            }     
       }
 
-      
-      
       function sendUsername(){
-        var truth = "true";
-        var username = document.getElementById("username").value;
-        socketio.emit('little_newbie', username);
+        var username = document.getElementById("username").value; //get the entered value of the username
+        socketio.emit('little_newbie', username); //send the username to server
+
         //LEELA, css: stop displaying this part of the page so they can't re-enter (fixes bug, but like not actually haha)
         //document.getElementById("getUsername").style();
       }
 
       function addRoom(){
         var roomName = document.getElementById("room_name").value;
-        socketio.emit('get_room_name', roomName);
+        var isChecked = document.getElementById("private").checked;
+        if(isChecked){
+          //password popup
+          //capture password
+        }
+        socketio.emit('get_room_name', roomName); //send roomname to server so it can add to sql
       }
 
       function sendMessage(){
-         var msg = document.getElementById("message_input").value;
-         var roomName = document.getElementById("room_title").textContent;
+         var msg = document.getElementById("message_input").value; //get the message content from the text box
+         var roomName = document.getElementById("room_title").textContent; 
          console.log("roomname " + roomName);
-         //var username = prompt('What\'s your username?');
-        //console.log(username);
-         socketio.emit("message_to_server", {message:msg}, {roomName:roomName});
-         //socketio.emit("message_to_server", username);
-         //socketio.emit('little_newbie', {username:username});
+         socketio.emit("message_to_server", {message:msg}, {roomName:roomName}); //sends the message to the server
       }
     </script>
 </html>
