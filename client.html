@@ -110,13 +110,15 @@
       }
 
       function leaveRoom(){ 
-            var x = document.getElementById("room_title");
-            x.remove(); //removes the name of the room from the top of the page
-            var z = document.getElementById("room_stuff");
+            document.getElementById("room_title").textContent = " ";
+            //x.remove(); //removes the name of the room from the top of the page
+            var z = document.getElementById("room_stuff").lastElementChild;
             z.remove(); //removes the "leave + roomname" button
 
-            //LEELA
             document.getElementById("rooms_list").style.visibility = "visible";//redisplay all of the rooms when a user leaves
+            document.getElementById("messenger").style.visibility = "hidden"; //hide the send message thing when the user leave room
+            document.getElementById("new_room_stuff").style.visibility = "visible"; //add room button now shows again
+            document.getElementById("chatlog").style.visibility = "hidden"; //messages from room don't display
 
             socketio.emit("remove_user_from_room"); //remove room attribute from user in mysql
             var y = document.getElementById("users_list").childElementCount; //number of rooms in the chatroom
@@ -149,7 +151,6 @@
       function sendMessage(){
          var msg = document.getElementById("message_input").value; //get the message content from the text box
          var roomName = document.getElementById("room_title").textContent; 
-         console.log("roomname " + roomName);
          socketio.emit("message_to_server", {message:msg}, {roomName:roomName}); //sends the message to the server
       }
     </script>

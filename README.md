@@ -3,15 +3,16 @@
 ###Todos:
 
 ######Gillian:
--  if a user's username isn't unique, there will be hella errors (throw error?)
-- a user cannot re-enter chat room with a different username otherwise things will not work (fix - stop displaying submit username shit)
 - try things in separate tabs
+    - when 1 users enters a room, the names of all the other users in that room displays for all users (even if they aren't in room)
+    - user1 and user2 can't be in the same room at the same time due to a SQL syntax error
 - if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
-- after a user joins and leaves a room, can't enter another room
+- what happens to the page on refresh?
+- user's name should print next to their message
 
 ######Leela:
 - after entering a room, get old messages from sql & display them correctly (i'll do this bc it involves sql)
-- theres a lot of css work that needs to be done (displaying / hiding shit)
+- if a user's username isn't unique, there will be hella errors (we need to iterate thru sql and alert if the username already exists)
 
 
 ######later to dos:
