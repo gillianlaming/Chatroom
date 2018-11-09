@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8"/>
+      <title>chatroom</title>
+      <script src="/socket.io/socket.io.js"></script>
+      <link rel="stylesheet" href="../chat.css">
+    </head>
+
+    <body>
+      <div id="getUsername">
+          <input type="text" id="username"/>
+          <button onclick="sendUsername()">submit username</button>
+      </div>
+      <div id="theChatroom">
+      <br><br>
+      <div class="column left_column">
+        <h3>rooms:</h3>
+        <p>(click to visit)</p>
+        <ul class="list" id="rooms_list"> <!-- should load in room names -->
+          
+        </ul>
+        <div class = "i_hate+computer_science" id="room_stuff"></div>
+
+        <div id="new_room_stuff">
+          <hr width="50%" style="margin-left: 0">
+          <input type="text" id="room_name"/>
+          <button onclick="addRoom()" id="add_room">add a room</button>
+          <input type="checkbox" id="private">private room</div>
+        </div>
+      </div>
+      <div class="column middle_column" id="chatroom">
+        <h1 id="room_title"></h1><!-- when room is selected, append room name to this -->
+        <div id="chatlog"></div><!-- should load in previous messages in this room  -->
+        <div id="messenger"> <!--this needs to be hidden at first-->
+          <input type="text" id="message_input"/>
+          <button onclick="sendMessage()">send message</button>
+        </div>
+      </div>
+      <div class="column right_column" id="chatroom">
+        <h3>users in this room:</h3>
+        <p>(click to kick out or ban)</p>
+          <ul class="list" id="users_list"> <!-- should add username once user joins room. also must broadcast change -->
+              
+          </ul>
+      </div>
+   </body>
+
+   <script>
+      var socketio = io.connect();
+      
+      // ADDS MESSAGE TO CHAT LOG
+      socketio.on("message_to_client", function(data) {
+        console.log(data);
+          var name = data['username']; var mess = data['message'];
+          document.getElementById("chatlog").appendChild(document.createTextNode(name + ": "));
+          document.getElementById("chatlog").appendChild(document.createTextNode(mess));
+          document.getElementById("chatlog").appendChild(document.createElement('br'));
+      });
+
+      socketio.on("room_names", function(roomName){
+        var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
+        btn.appendChild(document.createTextNode(roomName));
+
+        //ENTER ROOM 
+        btn.onclick = function(){ 
+          document.getElementById("room_title").appendChild(document.createTextNode(roomName));//displays the room name 
+          var button = document.getElementById("room_stuff").appendChild(document.createElement("button")); //creates button to leave the room
+          button.appendChild(document.createTextNode("leave " + roomName)); 
+          button.onclick = function(){
+            leaveRoom();
+          } 
+          socketio.emit("add_user_to_room", roomName); //add current user to room in sql
+          socketio.emit("users_in_room", roomName); //display all of the current users in the room
+          socketio.emit("messages_in_room", roomName); //display all the old messages when the user enters
+
+          //document.getElementsByTagNameNS("h3").style.visibility="visible";
+          document.getElementById("rooms_list").style.visibility="hidden"; //css leela, we need to make it so elements under "room list" don't show
+          document.getElementById("messenger").style.visibility = "visible"; //we're gonna hide messenger until a user enters a room, so now we need to make it not hidden
+          document.getElementById("new_room_stuff").style.visibility = "hidden"; //can't add a new room when you're still in a room
+         // document.getElementsByTagName("h3").style.visibility = "visible";
+        }
+        document.getElementById("rooms_list").appendChild(document.createElement("br"));
+      })
+
+      //once a user enters a room, display all the users in that room
+      socketio.on("display_users", function(username){
+          var usrbtn = document.getElementById("users_list").appendChild(document.createElement("button"));
+          usrbtn.onclick = function(){
+            userOptions() //will be able to block an ban users, report users
+          };
+          usrbtn.appendChild(document.createTextNode(username + " "));
+          
+          });
+
+      //banning a user and kicking a user out
+      function userOptions(){
+        console.log("user options")  
+      }
+
+      function leaveRoom(){ 
+            document.getElementById("room_title").textContent = " ";
+            //x.remove(); //removes the name of the room from the top of the page
+            var z = document.getElementById("room_stuff").lastElementChild;
+            z.remove(); //removes the "leave + roomname" button
+
+            document.getElementById("rooms_list").style.visibility = "visible";//redisplay all of the rooms when a user leaves
+            document.getElementById("messenger").style.visibility = "hidden"; //hide the send message thing when the user leave room
+            document.getElementById("new_room_stuff").style.visibility = "visible"; //add room button now shows again
+            document.getElementById("chatlog").style.visibility = "hidden"; //messages from room don't display
+
+            socketio.emit("remove_user_from_room"); //remove room attribute from user in mysql
+            var y = document.getElementById("users_list").childElementCount; //number of rooms in the chatroom
+            //iterate through all of the users in the room and remove each one from the "users_list"
+            for (var i =0; i<y ; i++){
+              var baby = document.getElementById("users_list").lastElementChild;
+              baby.remove(); //remove last element
+            }     
+      }
+
+      function sendUsername(){
+        var username = document.getElementById("username").value; //get the entered value of the username
+        socketio.emit('little_newbie', username); //send the username to server
+
+        //stop displaying this part of the page so they can't re-enter (fixes bug, but like not actually haha)
+        document.getElementById("getUsername").style.visibility = "hidden";
+        document.getElementById("theChatroom").style.visibility = "visible";
+      }
+
+      function addRoom(){
+        var roomName = document.getElementById("room_name").value;
+        var isChecked = document.getElementById("private").checked;
+        if(isChecked){
+          //password popup
+          //capture password
+        }
+        socketio.emit('get_room_name', roomName); //send roomname to server so it can add to sql
+      }
+
+      function sendMessage(){
+         var msg = document.getElementById("message_input").value;
+         var room = document.getElementById("room_title").textContent;
+         console.log("room " + room);
+         //var username = prompt('What\'s your username?');
+        //console.log(username);
+         socketio.emit("message_to_server", {message:msg, roomName:room});
+         //socketio.emit("message_to_server", username);
+         //socketio.emit('little_newbie', {username:username});
+      }
+    </script>
+</html>

@@ -43,8 +43,13 @@ p{
 #messenger{
     position: relative;
     top: 15px;
+    visibility: hidden;
 }
 
 .column h3{
     margin-bottom: -10px;
+}
+
+#theChatroom {
+    visibility: hidden
 }

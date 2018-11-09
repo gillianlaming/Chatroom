@@ -1,114 +1,115 @@
 //server file
 // Require the packages we will use:
-var http = require("http"),
-	socketio = require("socket.io"),
-	fs = require("fs"),
-	mysql = require('mysql');
+var express = require('express');
+var http = require('http');
+var app = express();
+var anyDB = require('any-db');
+var con = anyDB.createConnection('sqlite3://chatroom.db');
+var engines = require('consolidate');
+var server = http.createServer(app);
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(express.static(__dirname + '/public'));
+app.engine('html', engines.hogan); 
+app.set('views', __dirname + '/views'); 
+	
+con.query("CREATE TABLE IF NOT EXISTS rooms ( name varchar(255) PRIMARY KEY, messages mediumtext, password varchar(255) DEFAULT NULL, user varchar(255));")
+	.on('end', function(){
+		console.log('Made rooms table'); })
+	.on('error', console.error);
 
+con.query("CREATE TABLE IF NOT EXISTS messages ( id INTEGER PRIMARY KEY AUTOINCREMENT, content mediumtext NOT NULL, timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, user varchar(255) NOT NULL, room_name varchar(255) DEFAULT NULL, FOREIGN KEY (room_name) REFERENCES rooms (name));")
+	.on('end', function(){
+		console.log('Made messages table'); })
+	.on('error', console.error);
 
-// Listen for HTTP connections.  This is essentially a miniature static file server that only serves our one file, client.html:
-var app = http.createServer(function(req, resp){
-	// This callback runs when a new connection is made to our HTTP server
-	fs.readFile("client.html", function(err, data){
-		// This callback runs when the client.html file has been read from the filesystem.
-		
-		if(err) return resp.writeHead(500);
-		resp.writeHead(200);
-		resp.end(data);
-	});
+con.query("CREATE TABLE IF NOT EXISTS users ( user varchar(255) NOT NULL, id INTEGER PRIMARY KEY AUTOINCREMENT, room varchar(255) DEFAULT NULL);")
+	.on('end', function(){
+		console.log('Made messages table'); })
+	.on('error', console.error);
+
+// on load, display client.html
+app.get('/', function(request, response){
+	response.render('client.html', {});
 });
 
-var con = mysql.createConnection({
-	host: "localhost",
-	user: "chatroom_user",
-	password: "chatroom_pass",
-	database: "chatroom"
-});
-  con.connect(function(err) {
-	if (err) throw err;
-	console.log("Connected!");
-  });
-app.listen(3456);
-
-var io = socketio.listen(app);
-io.sockets.on("connection", function(socket){ // This callback runs when a new Socket.IO connection is established.
-
-    socket.on('little_newbie', function(username) { //don't ask me why this is called little_newbie
-		socket.username = username;			//set username as a session var
-		var insert = "INSERT INTO users (user) values (?)"; //insert the user into the user table
-		con.query(insert, socket.username, function(err){
-			if (err) throw err;
-			console.log("1 user inserted")
-		})
-
+var io = require('socket.io').listen(server);
+// Do the Socket.IO magic:
+io.on('connection', function (socket) {
+	
+	// ON LOG IN, USERNAME GOES INTO DATABASE AND ALL ROOMS ARE DISPLAYED
+    socket.on('little_newbie', function(username) {
+		socket.username = username;		
+		var insert = "INSERT INTO users (user) values ($1)";
+		con.query(insert, socket.username)
+			.on('error', console.error);
+		console.log(socket.username+' inserted into users');
+		//io.sockets.emit("display_users", username);	
 		var qry = "SELECT name from rooms";
-		con.query(qry, function(err, result, fields){
-			if (err) throw err;
-			for (var i =0; i<result.length; ++i){
-				roomName = result[i].name;
-				//console.log(roomName);
+		con.query(qry)
+			.on('error', console.error)
+			.on('data', function(result){
+				roomName = result.name;
 				socket.emit("room_names",roomName) //this needs to broadcast to all users
-			}
-		})
-			
-    });
-	socket.on("get_room_name", function(roomName){
-		socket.roomName = roomName; //this is a session variable. we may need to change this later
-		console.log("roomname " + socket.roomName);
-		var sql = "INSERT INTO rooms (name, user) VALUES (?)";
-		var values = [socket.roomName, socket.username];
-		con.query(sql, [values], function (err) {
-			if (err) throw err;
-			console.log("1 record inserted");
-			}); 
-		io.sockets.emit("room_names",roomName); //send the new roomname to the html
-		
-	})
-	socket.on('message_to_server', function(data) {
-		// This callback runs when the server receives a new message from the client.
-		console.log("username is global " + socket.username);
-		socket.message = data["message"];
-		console.log("current room " + roomName); //a little unclear where roomName is coming from, but it's working
-		var sql = "INSERT INTO messages (content, user, room_name) VALUES (?)";
-		var values = [socket.message, socket.username, roomName]; //message and username
-		  con.query(sql, [values], function (err) {
-			if (err) throw err;
-			console.log("1 record inserted");
-		  });  
-        console.log(data["message"]); // log it to the Node.JS output
-		io.sockets.emit("message_to_client",{message:data["message"]}) // broadcast the message to other users  
+			});
 	});
 	
+	// NEW ROOM CAN BE CREATED
+	socket.on("get_room_name", function(roomName){
+		socket.roomName = roomName; //this is a session variable. we may need to change this later
+
+		var sql = "INSERT INTO rooms (name, user) VALUES ($1, $2)";
+		var values = [socket.roomName, socket.username];
+		con.query(sql, values)
+			.on('error', console.error);
+		console.log(roomName+' inserted into db');
+
+		io.sockets.emit("room_names",roomName); //send the new roomname to the html
+	});
+
+	// INSERTS MESSAGE INTO DB
+	socket.on('message_to_server', function(data) {
+		var mess = data["message"];
+		var roomName = data["roomName"];
+
+		var sql = "INSERT INTO messages (content, user, room_name) VALUES ($1, $2, $3)";
+		var values = [mess, socket.username, roomName]; 
+			con.query(sql, values)
+				.on('error', console.error);  
+			console.log(mess+' inserted into '+roomName);
+
+		io.sockets.emit("message_to_client",{message:mess, username:socket.username}) // broadcast the message to other users  
+	});
+	
+	// DISPLAYS ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
 	socket.on("users_in_room", function(roomName){
 		var name = roomName;
-		var qry = ("SELECT user from users where room = ?") //FIX THIS
-		var values = roomName;
-				con.query(qry, [values], function(err, result, fields){
-					if (err) throw err;
-					for (var i =0; i<(result.length); ++i){
-						user1 = result[i].user;
-						io.sockets.emit("display_users",user1) //displays all the users to the current user
-					}
-					//insert more things here
+		var qry = ("SELECT user from users where room = $1") 
+		con.query(qry, name)
+			.on('data', function(result){
+				user1 = result.user;
+				io.sockets.emit("display_users",user1) //displays all the users to the current user
 			})
-	})
+			.on('error', console.error); 	
+				//insert more things here
+	});
 
+	// ADDS USER TO ROOM DB
 	socket.on("add_user_to_room", function(roomName){
-		var sql = "UPDATE users SET room = 'new' WHERE user = ?"; //FIX THIS, mysql syntax error
-		//var values = [roomName, socket.username];
-		con.query(sql, socket.username, function (err) {
-			if (err) throw err;
-			console.log("1 record updated");
-		  }); 
-	})
+		var sql = "UPDATE users SET room = $1 WHERE user = $2"; 
+		var values = [roomName, socket.username];
+		con.query(sql, values)
+			.on('error', console.error);
+		console.log('updated '+roomName+' db to include '+socket.username);	  
+	});
 
+	// REMOVES USER FROM ROOM DB 
 	socket.on("remove_user_from_room", function(){
-		var sql = "UPDATE users SET room = 'NULL' WHERE user = ?";
-		con.query(sql, socket.username, function (err) {
-			if (err) throw err;
-			console.log("1 record updated");
-		  }); 
-	})
-
+		var sql = "UPDATE users SET room = 'NULL' WHERE user = $1";
+		con.query(sql, socket.username)
+			.on('error', console.error); 
+		console.log('removed '+socket.username+' from room');
+	});
 });
 
+server.listen(3456);
