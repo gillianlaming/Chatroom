@@ -78,20 +78,33 @@ io.on('connection', function (socket) {
 				.on('error', console.error);  
 			console.log(mess+' inserted into '+roomName);
 
-		io.sockets.emit("message_to_client",{message:mess, username:socket.username}) // broadcast the message to other users  
+		io.sockets.emit("display_message",{message:mess, username:socket.username, timestamp:'now'}) // broadcast the message to other users  
 	});
 	
-	// DISPLAYS ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
+	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
 	socket.on("users_in_room", function(roomName){
 		var name = roomName;
 		var qry = ("SELECT user from users where room = $1") 
 		con.query(qry, name)
 			.on('data', function(result){
 				user1 = result.user;
-				io.sockets.emit("display_users",user1) //displays all the users to the current user
+				io.sockets.emit("display_users",user1) // send users to client
 			})
 			.on('error', console.error); 	
-				//insert more things here
+	});
+
+	// GET ALL MESSAGES IN A ROOM
+	socket.on("messages_in_room", function(roomName){
+		var name = roomName;
+		var qry = ("SELECT * from messages where room_name = $1") 
+		con.query(qry, name)
+			.on('data', function(result){
+				user = result.user;
+				mess = result.content;
+				time = result.timestamp;
+				io.sockets.emit("display_message",{message:mess, username:user, timestamp:time}); // send messages to client
+			})
+			.on('error', console.error); 	
 	});
 
 	// ADDS USER TO ROOM DB

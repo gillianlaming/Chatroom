@@ -43,7 +43,19 @@ p{
 #messenger{
     position: relative;
     top: 15px;
-    visibility: hidden;
+}
+#getUsername{
+    position: absolute;
+    width: 60%;
+    top: 150px;
+    left: 20%;
+    text-align: center;
+}
+
+#chatlog{
+    overflow-y: scroll;
+    border-left: 2px solid lightskyblue;
+    padding-left: 7px;
 }
 
 .column h3{
@@ -52,4 +64,8 @@ p{
 
 #theChatroom {
     visibility: hidden
+}
+
+#leave_room{
+    visibility: hidden;
 }

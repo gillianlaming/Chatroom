@@ -2,18 +2,23 @@
 
 ###Todos:
 
+##HI YES I MERGED SO ALL NEW ISSUES NOW YAY!
+
+####ISSUES:
+- doing multiple things. e.g. entering, leaving, entering again, sending a message, weird shit starts happening
+- multiple tabs is alllll fucked up
+
+
 ######Gillian:
 - try things in separate tabs
     - when 1 users enters a room, the names of all the other users in that room displays for all users (even if they aren't in room)
     - user1 and user2 can't be in the same room at the same time due to a SQL syntax error
 - if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
 - what happens to the page on refresh?
-- user's name should print next to their message
 
 ######Leela:
-- after entering a room, get old messages from sql & display them correctly (i'll do this bc it involves sql)
+- remove users from database when they leave the site!!
 - if a user's username isn't unique, there will be hella errors (we need to iterate thru sql and alert if the username already exists)
-
 
 ######later to dos:
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
