@@ -59,11 +59,11 @@
       window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         console.log("testing")
         var roomName = document.getElementById("room_title").textContent;
-        if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room
-          socketio.emit("remove_user_from_room");
-          leaveRoom();
-          socketio.emit("users_in_room", roomName); //display all of the current users in the room
-        }
+        // if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room
+        //   socketio.emit("remove_user_from_room");
+        //   leaveRoom();
+        //   socketio.emit("users_in_room", roomName); //display all of the current users in the room
+        // }
       });
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(roomName){
