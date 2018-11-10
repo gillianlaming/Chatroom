@@ -73,8 +73,8 @@
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
           document.getElementById("chatlog").innerHTML = ""; // clear previous chat
-          socketio.emit("add_user_to_room", roomName); //add current user to room in sql
           socketio.emit("users_in_room", roomName); //display all of the current users in the room
+          socketio.emit("add_user_to_room", roomName); //add current user to room in sql
           socketio.emit("messages_in_room", roomName); //display all the old messages when the user enters
 
           document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
