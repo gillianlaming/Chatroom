@@ -112,6 +112,9 @@
           document.getElementById("chatlog").appendChild(document.createElement('br'));
           document.getElementById("chatlog").appendChild(document.createElement('br'));
       });
+      socketio.on("display_user", function(username){
+        document.getElementById("rooms_header").appendChild(document.createTextNode("Hello, " + username));
+      });
 
       socketio.on("remove_user", function(username){  //remove username button
         console.log("trying to remove user " + username);
