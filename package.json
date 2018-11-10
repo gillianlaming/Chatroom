@@ -4,6 +4,8 @@
   "description": "package for chatroom",
   "main": "chat_server.js",
   "dependencies": {
+    "any-db": "^2.2.1",
+    "express": "^4.16.4",
     "mysql": "^2.16.0",
     "mysqli": "^3.0.5",
     "socket.io": "^2.1.1"

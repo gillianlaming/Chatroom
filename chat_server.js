@@ -78,7 +78,7 @@ io.on('connection', function (socket) {
 				.on('error', console.error);  
 			console.log(mess+' inserted into '+roomName);
 
-		io.sockets.emit("display_message",{message:mess, username:socket.username, timestamp:'now'}) // broadcast the message to other users  
+		socket.emit("display_message",{message:mess, username:socket.username, timestamp:'now'}) // broadcast the message to other users  
 	});
 	
 	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
@@ -88,7 +88,7 @@ io.on('connection', function (socket) {
 		con.query(qry, name)
 			.on('data', function(result){
 				user1 = result.user;
-				io.sockets.emit("display_users",user1) // send users to client
+				io.sockets.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
 			})
 			.on('error', console.error); 	
 	});
@@ -102,7 +102,7 @@ io.on('connection', function (socket) {
 				user = result.user;
 				mess = result.content;
 				time = result.timestamp;
-				io.sockets.emit("display_message",{message:mess, username:user, timestamp:time}); // send messages to client
+				socket.emit("display_message",{message:mess, username:user, timestamp:time}); // send messages to client
 			})
 			.on('error', console.error); 	
 	});

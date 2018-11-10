@@ -54,7 +54,10 @@
 
    <script>
       var socketio = io.connect();
-      
+      document.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
+        socketio.emit("remove_user_from_room"); //remove room attribute from user
+        socketio.emit("users_in_room", roomName); //display all of the current users in the room
+      });
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(roomName){
         var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
@@ -118,7 +121,7 @@
             document.getElementById("middle").style.visibility = "hidden"; 
             document.getElementById("right").style.visibility = "hidden"; // hide middle and right column 
 
-            document.getElementById("users_list").innerHTML = ""; // remove all users from list
+            document.getElementById("users_list").innerHTML = ""; // remove all users from list ISSUE
 
             socketio.emit("remove_user_from_room"); //remove room attribute from user
       }

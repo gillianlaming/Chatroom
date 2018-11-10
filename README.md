@@ -8,6 +8,10 @@
 - doing multiple things. e.g. entering, leaving, entering again, sending a message, weird shit starts happening
 - multiple tabs is alllll fucked up
 
+####Package Json:
+- npm install express
+- any db
+- any-db-sqlite3
 
 ######Gillian:
 - try things in separate tabs
