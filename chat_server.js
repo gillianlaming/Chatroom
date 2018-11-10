@@ -87,10 +87,11 @@ io.on('connection', function (socket) {
 		var qry = ("SELECT user from users where room = $1") 
 		con.query(qry, name)
 			.on('data', function(result){
-				user1 = result.user;
-				io.sockets.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
+				socket.user1 = result.user;
+				//io.sockets.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
 			})
 			.on('error', console.error); 	
+			io.sockets.emit("display_users",socket.user1) 
 	});
 
 	// GET ALL MESSAGES IN A ROOM
