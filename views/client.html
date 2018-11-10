@@ -58,8 +58,10 @@
         
         var roomName = document.getElementById("room_name").value;
         if (roomName != NULL){ //if the user is in a room
-          socketio.emit("remove_user_from_room"); //remove room attribute from user
-          socketio.emit("users_in_room", roomName); //display all of the current users in the room
+          leaveRoom();
+          // socketio.emit("remove_user_from_room"); //remove room attribute from user
+          // //
+          //socketio.emit("users_in_room", roomName); //display all of the current users in the room
         }
       });
       // DISPLAYS ROOM NAMES AS BUTTONS
