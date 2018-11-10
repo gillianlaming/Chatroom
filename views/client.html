@@ -54,11 +54,13 @@
 
    <script>
      var loggedIn; 
+     var nickname;
+     var roomName;
 
       var socketio = io.connect();
       window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         console.log("testing")
-        var roomName = document.getElementById("room_title").textContent;
+        roomName = document.getElementById("room_title").textContent;
         if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room
           socketio.emit("remove_user_from_room");
           leaveRoom();
@@ -112,7 +114,10 @@
       });
 
       socketio.on("remove_user", function(username){  //remove username button
-        var len = document.getElementById("users_list").childElementCount();
+        document.getElementById("users_list").style.display = "none";
+        socketio.emit("users_in_room", roomName);
+        document.getElementById("users_list").style.display = "block";
+        //var len = document.getElementById("users_list").childElementCount;
         //for ()
       });
 
