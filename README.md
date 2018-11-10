@@ -8,11 +8,6 @@
 - doing multiple things. e.g. entering, leaving, entering again, sending a message, weird shit starts happening
 - multiple tabs is alllll fucked up
 
-####Package Json:
-- npm install express
-- any db
-- any-db-sqlite3
-
 ######Gillian:
 - if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
 - throw error if username already exists
