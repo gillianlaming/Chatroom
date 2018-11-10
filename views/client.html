@@ -53,11 +53,13 @@
    </body>
 
    <script>
+     var loggedIn; 
+
       var socketio = io.connect();
       window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         console.log("testing")
         var roomName = document.getElementById("room_title").textContent;
-        if (roomName != "null"){ //if the user is in a room
+        if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room
           socketio.emit("remove_user_from_room");
           leaveRoom();
           socketio.emit("users_in_room", roomName); //display all of the current users in the room
@@ -75,7 +77,7 @@
           socketio.emit("users_in_room", roomName); //display all of the current users in the room
           socketio.emit("add_user_to_room", roomName); //add current user to room in sql
           socketio.emit("messages_in_room", roomName); //display all the old messages when the user enters
-
+          loggedIn = "true";
           document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
           document.getElementById("rooms_header").style.visibility="hidden"; // hide header
           document.getElementById("rooms_list").style.visibility="hidden"; // hide room list 
