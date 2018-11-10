@@ -14,6 +14,7 @@ app.engine('html', engines.hogan);
 app.set('views', __dirname + '/views'); 
 
 var nickname;
+var shroom; 
 	
 con.query("CREATE TABLE IF NOT EXISTS rooms ( name varchar(255) PRIMARY KEY, messages mediumtext, password varchar(255) DEFAULT NULL, user varchar(255));")
 	.on('end', function(){
@@ -58,10 +59,10 @@ io.on('connection', function (socket) {
 	
 	// NEW ROOM CAN BE CREATED
 	socket.on("get_room_name", function(roomName){
-		socket.roomName = roomName; //this is a session variable. we may need to change this later
+		shroom = roomName; //this is a session variable. we may need to change this later
 
 		var sql = "INSERT INTO rooms (name, user) VALUES ($1, $2)";
-		var values = [socket.roomName, nickname];
+		var values = [shroom, nickname];
 		con.query(sql, values)
 			.on('error', console.error);
 		console.log(roomName+' inserted into db');
