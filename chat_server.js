@@ -88,7 +88,7 @@ io.on('connection', function (socket) {
 		con.query(qry, name)
 			.on('data', function(result){
 				user1 = result.user;
-				io.sockets.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
+				socket.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
 			})
 			.on('error', console.error); 	
 	});
