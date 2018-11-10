@@ -110,6 +110,10 @@
           document.getElementById("chatlog").appendChild(document.createElement('br'));
       });
 
+      socketio.on("remove_user", function(username){  //remove username button
+
+      });
+
       //banning a user and kicking a user out
       function userOptions(){
         console.log("user options")  

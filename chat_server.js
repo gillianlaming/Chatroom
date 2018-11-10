@@ -88,7 +88,7 @@ io.on('connection', function (socket) {
 		con.query(qry, name)
 			.on('data', function(result){
 				user1 = result.user;
-				socket.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
+				//socket.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
 			})
 			.on('error', console.error); 	
 			
@@ -124,6 +124,7 @@ io.on('connection', function (socket) {
 		con.query(sql, socket.username)
 			.on('error', console.error); 
 		console.log('removed '+socket.username+' from room');
+		io.sockets.emit("")
 	});
 
 });
