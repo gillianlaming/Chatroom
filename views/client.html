@@ -55,11 +55,11 @@
    <script>
       var socketio = io.connect();
       window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
-        var roomName = document.getElementById("room_name").value;
+        var roomName = document.getElementById("room_title").textContent;
         if (roomName != NULL){ //if the user is in a room
-        socketio.emit("remove_user_from_room");
-        leaveRoom();
-        socketio.emit("users_in_room", roomName); //display all of the current users in the room
+          socketio.emit("remove_user_from_room");
+          leaveRoom();
+          socketio.emit("users_in_room", roomName); //display all of the current users in the room
         }
        
         
