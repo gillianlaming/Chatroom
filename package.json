@@ -4,13 +4,6 @@
   "description": "package for chatroom",
   "main": "chat_server.js",
   "dependencies": {
-<<<<<<< HEAD
-    "any-db": "^2.2.1",
-    "express": "^4.16.4",
-    "mysql": "^2.16.0",
-    "mysqli": "^3.0.5",
-    "socket.io": "^2.1.1"
-=======
     "any-db": "2.1.x",
 		"any-db-sqlite3": "^2.1.4",
 		"body-parser": "^1.18.3",
@@ -28,7 +21,6 @@
 		"serve-static": "^1.13.2",
 		"socket.io": "^2.1.1",
 		"sqlite3": "^4.0.3"
->>>>>>> 7a4eb6295c193f4f20b1f675ca2f713d0f99d1d5
   },
   "devDependencies": {},
   "scripts": {
