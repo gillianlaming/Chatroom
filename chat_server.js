@@ -87,11 +87,11 @@ io.on('connection', function (socket) {
 		var qry = ("SELECT user from users where room = $1") 
 		con.query(qry, name)
 			.on('data', function(result){
-				socket.user1 = result.user;
-				//io.sockets.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
+				user1 = result.user;
+				socket.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
 			})
 			.on('error', console.error); 	
-			io.sockets.emit("display_users",socket.user1) 
+			
 	});
 
 	// GET ALL MESSAGES IN A ROOM
@@ -114,7 +114,8 @@ io.on('connection', function (socket) {
 		var values = [roomName, socket.username];
 		con.query(sql, values)
 			.on('error', console.error);
-		console.log('updated '+roomName+' db to include '+socket.username);	  
+		console.log('updated '+roomName+' db to include '+socket.username);	 
+		io.sockets.emit("display_users", socket.username); 
 	});
 
 	// REMOVES USER FROM ROOM DB 
