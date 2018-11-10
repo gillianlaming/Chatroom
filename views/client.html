@@ -115,9 +115,15 @@
 
       socketio.on("remove_user", function(username){  //remove username button
         console.log("trying to remove user " + username);
+        var len = document.getElementById("users_list").childElementCount;
+        for (var i = 0; i<len; ++i){
+          if (document.getElementById('users_list')[i].textContent == "username"){
+            //do something
+          }
+        }
         document.getElementById("users_list").style.display = "none";
         socketio.emit("users_in_room", roomName);
-        document.getElementById("users_list").style.display = "block";
+        //document.getElementById("users_list").style.display = "block";
         //var len = document.getElementById("users_list").childElementCount;
         //for ()
       });
