@@ -14,11 +14,12 @@
 - any-db-sqlite3
 
 ######Gillian:
-- try things in separate tabs
-    - when 1 users enters a room, the names of all the other users in that room displays for all users (even if they aren't in room)
-    - user1 and user2 can't be in the same room at the same time due to a SQL syntax error
 - if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
-- what happens to the page on refresh?
+- throw error if username already exists
+- slide into dms
+- if room is private, we need a dialog box for password, and then pass that to sql
+- if a user wants to enter a room that is private, dialog box to submit password and then check that w the sql
+- chat creators 
 
 ######Leela:
 - remove users from database when they leave the site!!
