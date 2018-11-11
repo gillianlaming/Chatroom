@@ -60,12 +60,12 @@
       var socketio = io.connect();
       window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         console.log("testing")
-        roomName = document.getElementById("room_title").textContent;
-        if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room
-          socketio.emit("remove_user_from_room"); //need to pass username
-          leaveRoom();
-          socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
-        }
+        // roomName = document.getElementById("room_title").textContent;
+        // if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room //this is buggy
+        //   socketio.emit("remove_user_from_room"); //need to pass username
+        //   leaveRoom();
+        //   socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
+        // }
       });
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(data){
@@ -78,7 +78,9 @@
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
           document.getElementById("chatlog").innerHTML = ""; // clear previous chat
+          document.getElementById("users_list").innerHTML="";
           socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
+
           socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
           socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
           loggedIn = "true";
@@ -103,6 +105,7 @@
           usrbtn.onclick = function(){
             userOptions() //will be able to block an ban users, report users
           };
+          
       });
       
       // Display all the messages in a room
@@ -127,15 +130,14 @@
         console.log("trying to remove user " + username);
         var len = document.getElementById("users_list").childElementCount;
         for (var i = 0; i<len; ++i){
-          if (document.getElementById('users_list')[i].textContent == "username"){
+          if (document.getElementById('users_list')[i].textContent == "username"){ //buggy
             //do something
           }
         }
         document.getElementById("users_list").style.display = "none";
         socketio.emit("users_in_room", {roomName:roomName});
         document.getElementById("users_list").style.display = "block";
-        //var len = document.getElementById("users_list").childElementCount;
-        //for ()
+        
       });
 
       //banning a user and kicking a user out

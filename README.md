@@ -10,14 +10,14 @@
 
 ######Gillian:
 - if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
-- throw error if username already exists
+- throw error if username already exists (!!!!!!!!)
 - slide into dms
 - if room is private, we need a dialog box for password, and then pass that to sql
 - if a user wants to enter a room that is private, dialog box to submit password and then check that w the sql
 - chat creators 
 
 ######Leela:
-- remove users from database when they leave the site!!
+- remove users from database whsen they leave the site!!
 - if a user's username isn't unique, there will be hella errors (we need to iterate thru sql and alert if the username already exists)
 
 ######later to dos:

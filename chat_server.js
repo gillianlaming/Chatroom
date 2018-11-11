@@ -46,15 +46,15 @@ io.on('connection', function (socket) {
 		con.query(insert, username)
 			.on('error', console.error);
 		console.log(username+' inserted into users');
-		//io.sockets.emit("display_users", username);	
+		
 		var qry = "SELECT name from rooms";
 		con.query(qry)
 			.on('error', console.error)
 			.on('data', function(result){
 				roomName = result.name;
-				socket.emit("room_names",{roomName:roomName, username:username}) //this needs to broadcast to all users
+				socket.emit("room_names",{roomName:roomName, username:username}) 
 			});
-		socket.emit("display_user", {username:username});
+		socket.emit("display_user", {username:username}); //sends the username to the html so the html can access it for later use
 	});
 	
 	// NEW ROOM CAN BE CREATED
@@ -83,7 +83,7 @@ io.on('connection', function (socket) {
 				.on('error', console.error);  
 			console.log(mess+' inserted into '+roomName);
 
-		socket.emit("display_message",{message:mess, username:username, timestamp:'now'}) // broadcast the message to other users  
+		io.sockets.emit("display_message",{message:mess, username:username, timestamp:'now'}) // broadcast the new message to other users  
 	});
 	
 	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
@@ -92,14 +92,14 @@ io.on('connection', function (socket) {
 		var qry = ("SELECT user from users where room = $1") 
 		con.query(qry, roomName)
 			.on('data', function(result){
-				user1 = result.user;
-				socket.emit("display_users",{username:user1}) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
+				username = result.user;
+				socket.emit("display_users",{username:username}) //
 			})
 			.on('error', console.error); 	
 			
 	});
 
-	// GET ALL MESSAGES IN A ROOM
+	// GET ALL PREVIOUS MESSAGES IN A ROOM
 	socket.on("messages_in_room", function(data){
 		var roomName = data["roomName"];
 		var qry = ("SELECT * from messages where room_name = $1") 
