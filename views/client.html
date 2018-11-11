@@ -21,7 +21,7 @@
           <div id="rooms_header">
             <h3>rooms:</h3>
             <p>(click to visit)</p>
-          <div id="username"></div>
+          
           </div>
           <ul class="list" id="rooms_list">
              <!-- should load in room names -->
@@ -36,6 +36,7 @@
         </div>
         
         <div class="column middle_column" id="middle">
+          <i id="name"></i>
           <h1>room <i id="room_title"></i></h1><!-- when room is selected, append room name to this -->
           <div id="chatlog"></div><!-- should load in previous messages in this room  -->
           <div id="messenger"> 
@@ -107,9 +108,9 @@
       // Display all the messages in a room
       socketio.on("display_message", function(data){
           // get messages and append to chatlog  
-          var name = data['username']; var mess = data['message']; var time = data['timestamp'];  
+          var username = data['username']; var mess = data['message']; var time = data['timestamp'];  
                 // idk if timestamp is required, wouldnt be too hard to display, but if not required lets not
-          document.getElementById("chatlog").appendChild(document.createTextNode(name + ": "));
+          document.getElementById("chatlog").appendChild(document.createTextNode(username + ": "));
           document.getElementById("chatlog").appendChild(document.createTextNode(mess));
           document.getElementById("chatlog").appendChild(document.createElement('br'));
           document.getElementById("chatlog").appendChild(document.createElement('br'));
@@ -122,6 +123,7 @@
 
       socketio.on("remove_user", function(data){  //remove username button
         var username = data["username"];
+        var roomName = data["roomName"];
         console.log("trying to remove user " + username);
         var len = document.getElementById("users_list").childElementCount;
         for (var i = 0; i<len; ++i){
@@ -162,32 +164,37 @@
       // LOG IN
       function sendUsername(){
         var username = document.getElementById("username").value; //get the entered value of the username
+        document.getElementById("name").innerHTML = username;
+        document.getElementById("name").style.visibility = "hidden";
         document.getElementById("getUsername").style.visibility = "hidden";
         document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
         document.getElementById("username").value = ""; // reset form
 
         socketio.emit('little_newbie', {username:username}); //send the username to server
+
       }
 
       // NEW ROOM
       function addRoom(){
           var roomName = document.getElementById("room_name").value;
+          var username = document.getElementById("name").textContent;
           var isChecked = document.getElementById("private").checked;
           if(isChecked){
             //password popup
             //capture password
           }
           document.getElementById("room_name").value = ""; //reset form
-          socketio.emit('get_room_name', {roomName:roomName}); //send roomname to server so it can add to sql //needs user
+          socketio.emit('get_room_name', {roomName:roomName, username:username, private:isChecked}); //send roomname to server so it can add to sql //needs user
       }
 
       // SEND A MESSAGE
       function sendMessage(){
+        var username = document.getElementById("name").textContent; //get the entered value of the username
          var msg = document.getElementById("message_input").value;
          var room = document.getElementById("room_title").textContent;
          document.getElementById("message_input").value = ""; // reset form
 
-         socketio.emit("message_to_server", {message:msg, roomName:room}); // send message and username to sql
+         socketio.emit("message_to_server", {message:msg, roomName:room, username:username}); // send message and username to sql //needs user
       }
 
     </script>
