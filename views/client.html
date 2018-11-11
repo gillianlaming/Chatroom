@@ -21,6 +21,7 @@
           <div id="rooms_header">
             <h3>rooms:</h3>
             <p>(click to visit)</p>
+          <div id="username"></div>
           </div>
           <ul class="list" id="rooms_list">
              <!-- should load in room names -->
@@ -54,21 +55,21 @@
 
    <script>
      var loggedIn; 
-     var nickname;
-     var roomName;
 
       var socketio = io.connect();
       window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         console.log("testing")
         roomName = document.getElementById("room_title").textContent;
         if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room
-          socketio.emit("remove_user_from_room");
+          socketio.emit("remove_user_from_room"); //need to pass username
           leaveRoom();
-          socketio.emit("users_in_room", roomName); //display all of the current users in the room
+          socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
         }
       });
       // DISPLAYS ROOM NAMES AS BUTTONS
-      socketio.on("room_names", function(roomName){
+      socketio.on("room_names", function(data){
+        var roomName = data["roomName"];
+        var username = data["username"];
         var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
         btn.appendChild(document.createTextNode(roomName));
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
@@ -76,9 +77,9 @@
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
           document.getElementById("chatlog").innerHTML = ""; // clear previous chat
-          socketio.emit("users_in_room", roomName); //display all of the current users in the room
-          socketio.emit("add_user_to_room", roomName); //add current user to room in sql
-          socketio.emit("messages_in_room", roomName); //display all the old messages when the user enters
+          socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
+          socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
+          socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
           loggedIn = "true";
           document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
           document.getElementById("rooms_header").style.visibility="hidden"; // hide header
@@ -93,7 +94,8 @@
       });
 
       // Display all the users in a room
-      socketio.on("display_users", function(username){
+      socketio.on("display_users", function(data){
+          var username = data["username"];
           var usrbtn = document.getElementById("users_list").appendChild(document.createElement("button"));
           usrbtn.appendChild(document.createTextNode(username + " "));
           document.getElementById("users_list").appendChild(document.createElement("br"));
@@ -112,11 +114,14 @@
           document.getElementById("chatlog").appendChild(document.createElement('br'));
           document.getElementById("chatlog").appendChild(document.createElement('br'));
       });
-      socketio.on("display_user", function(username){
-        document.getElementById("rooms_header").appendChild(document.createTextNode("Hello, " + username));
+
+      socketio.on("display_user", function(data){
+        var username = data["username"];
+        document.getElementById("username").appendChild(document.createTextNode(username)); //print username at the top of the page so we can access it later
       });
 
-      socketio.on("remove_user", function(username){  //remove username button
+      socketio.on("remove_user", function(data){  //remove username button
+        var username = data["username"];
         console.log("trying to remove user " + username);
         var len = document.getElementById("users_list").childElementCount;
         for (var i = 0; i<len; ++i){
@@ -125,7 +130,7 @@
           }
         }
         document.getElementById("users_list").style.display = "none";
-        socketio.emit("users_in_room", roomName);
+        socketio.emit("users_in_room", {roomName:roomName});
         document.getElementById("users_list").style.display = "block";
         //var len = document.getElementById("users_list").childElementCount;
         //for ()
@@ -138,6 +143,8 @@
 
       // LEAVE ROOM
       function leaveRoom(){ 
+            var roomName = document.getElementById("room_title").textContent;
+            var username =  document.getElementById("username").textContent; //WRONG
             document.getElementById("room_title").innerHTML = ""; // delete name
 
             document.getElementById("leave_room").style.visibility = "hidden";  // hide leave room button
@@ -149,7 +156,7 @@
 
             document.getElementById("users_list").innerHTML = ""; // remove all users from list ISSUE
 
-            socketio.emit("remove_user_from_room"); //remove room attribute from user
+            socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user //need to pass username
       }
 
       // LOG IN
@@ -159,7 +166,7 @@
         document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
         document.getElementById("username").value = ""; // reset form
 
-        socketio.emit('little_newbie', username); //send the username to server
+        socketio.emit('little_newbie', {username:username}); //send the username to server
       }
 
       // NEW ROOM
@@ -171,8 +178,7 @@
             //capture password
           }
           document.getElementById("room_name").value = ""; //reset form
-
-          socketio.emit('get_room_name', roomName); //send roomname to server so it can add to sql
+          socketio.emit('get_room_name', {roomName:roomName}); //send roomname to server so it can add to sql //needs user
       }
 
       // SEND A MESSAGE

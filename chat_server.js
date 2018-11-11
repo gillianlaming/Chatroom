@@ -40,34 +40,35 @@ var io = require('socket.io').listen(server);
 io.on('connection', function (socket) {
 	
 	// ON LOG IN, USERNAME GOES INTO DATABASE AND ALL ROOMS ARE DISPLAYED
-    socket.on('little_newbie', function(username) {
-		socket.username = username;		
+    socket.on('little_newbie', function(data) {
+		var username = data["username"];		
 		var insert = "INSERT INTO users (user) values ($1)";
-		con.query(insert, socket.username)
+		con.query(insert, username)
 			.on('error', console.error);
-		console.log(socket.username+' inserted into users');
+		console.log(username+' inserted into users');
 		//io.sockets.emit("display_users", username);	
 		var qry = "SELECT name from rooms";
 		con.query(qry)
 			.on('error', console.error)
 			.on('data', function(result){
 				roomName = result.name;
-				socket.emit("room_names",roomName) //this needs to broadcast to all users
+				socket.emit("room_names",{roomName:roomName, username:username}) //this needs to broadcast to all users
 			});
-		socket.emit("display_user", socket.username);
+		socket.emit("display_user", {username:username});
 	});
 	
 	// NEW ROOM CAN BE CREATED
-	socket.on("get_room_name", function(roomName){
-		socket.roomName = roomName; //this is a session variable. we may need to change this later
+	socket.on("get_room_name", function(data){ //needs username
+
+		roomName = data["roomName"]; //this is a session variable. we may need to change this later
 
 		var sql = "INSERT INTO rooms (name, user) VALUES ($1, $2)";
-		var values = [socket.roomName, socket.username];
+		var values = [roomName, socket.username];
 		con.query(sql, values)
 			.on('error', console.error);
 		console.log(roomName+' inserted into db');
 
-		io.sockets.emit("room_names",roomName); //send the new roomname to the html
+		io.sockets.emit("room_names",{roomName:roomName}); //send the new roomname to the html
 	});
 
 	// INSERTS MESSAGE INTO DB
@@ -85,23 +86,23 @@ io.on('connection', function (socket) {
 	});
 	
 	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
-	socket.on("users_in_room", function(roomName){
-		var name = roomName;
+	socket.on("users_in_room", function(data){
+		var roomName = data["roomName"];
 		var qry = ("SELECT user from users where room = $1") 
-		con.query(qry, name)
+		con.query(qry, roomName)
 			.on('data', function(result){
 				user1 = result.user;
-				socket.emit("display_users",user1) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
+				socket.emit("display_users",{username:user1}) // send users to client MAYBE CHANGE TO SOCKET.EMIT (?)
 			})
 			.on('error', console.error); 	
 			
 	});
 
 	// GET ALL MESSAGES IN A ROOM
-	socket.on("messages_in_room", function(roomName){
-		var name = roomName;
+	socket.on("messages_in_room", function(data){
+		var roomName = data["roomName"];
 		var qry = ("SELECT * from messages where room_name = $1") 
-		con.query(qry, name)
+		con.query(qry, roomName)
 			.on('data', function(result){
 				user = result.user;
 				mess = result.content;
@@ -112,22 +113,26 @@ io.on('connection', function (socket) {
 	});
 
 	// ADDS USER TO ROOM DB
-	socket.on("add_user_to_room", function(roomName){
+	socket.on("add_user_to_room", function(data){ //needs username
+		var roomName = data["roomName"];
+		var username = data["username"];
 		var sql = "UPDATE users SET room = $1 WHERE user = $2"; 
-		var values = [roomName, socket.username];
+		var values = [roomName, username];
 		con.query(sql, values)
 			.on('error', console.error);
-		console.log('updated '+roomName+' db to include '+socket.username);	 
-		io.sockets.emit("display_users", socket.username); 
+		console.log('updated '+roomName+' db to include '+username);	 
+		io.sockets.emit("display_users", {username:username}); 
 	});
 
 	// REMOVES USER FROM ROOM DB 
-	socket.on("remove_user_from_room", function(){
+	socket.on("remove_user_from_room", function(data){ //needs username and room name
+		var roomName = data["roomName"];
+		var username = data['username'];
 		var sql = "UPDATE users SET room = 'NULL' WHERE user = $1";
-		con.query(sql, socket.username)
+		con.query(sql, username)
 			.on('error', console.error); 
-		console.log('removed '+socket.username+' from room');
-		io.sockets.emit("remove_user", socket.username);
+		console.log('removed '+username+' from room');
+		io.sockets.emit("remove_user", {username:username, roomName:roomName});
 	});
 
 });
