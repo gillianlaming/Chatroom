@@ -58,15 +58,7 @@
      var loggedIn; 
 
       var socketio = io.connect();
-      window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
-        console.log("testing")
-        // roomName = document.getElementById("room_title").textContent;
-        // if ((loggedIn == "true") && (roomName != "null")){ //if the user is in a room //this is buggy
-        //   socketio.emit("remove_user_from_room"); //need to pass username
-        //   leaveRoom();
-        //   socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
-        // }
-      });
+      
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(data){
         var roomName = data["roomName"];
@@ -77,7 +69,7 @@
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
           document.getElementById("chatlog").innerHTML = ""; // clear previous chat
-          document.getElementById("users_list").innerHTML="";
+          document.getElementById("users_list").innerHTML=""; //clears the users in the room
           socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
 
           socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
@@ -90,8 +82,14 @@
           
           document.getElementById("middle").style.visibility = "visible"; // show chatroom
           document.getElementById("right").style.visibility = "visible"; // show users list
-
           document.getElementById("room_title").innerHTML = roomName; // show name
+
+        //   window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
+        //     console.log("page was reloaded")
+        //     socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //need to pass username
+        //     leaveRoom();
+        //     socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
+        //     });
         }
       });
 
@@ -129,14 +127,21 @@
         console.log("trying to remove user " + username);
         var len = document.getElementById("users_list").childElementCount;
         for (var i = 0; i<len; ++i){
-          if (document.getElementById('users_list')[i].textContent == "username"){ //buggy
+          //if (document.getElementById('users_list')[i].textContent == "username"){ //buggy
             //do something
-          }
         }
+     
         document.getElementById("users_list").style.display = "none";
         socketio.emit("users_in_room", {roomName:roomName});
         document.getElementById("users_list").style.display = "block";
         
+      });
+
+      socketio.on("username_already_exists", function(data){
+        username = data["username"];
+        console.log("username already exists");
+        alert("The username "+ username +" already exists. Please choose another.")
+        console.log("username already exists");
       });
 
       //banning a user and kicking a user out

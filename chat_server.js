@@ -41,20 +41,34 @@ io.on('connection', function (socket) {
 	
 	// ON LOG IN, USERNAME GOES INTO DATABASE AND ALL ROOMS ARE DISPLAYED
     socket.on('little_newbie', function(data) {
-		var username = data["username"];		
-		var insert = "INSERT INTO users (user) values ($1)";
-		con.query(insert, username)
-			.on('error', console.error);
-		console.log(username+' inserted into users');
-		
-		var qry = "SELECT name from rooms";
-		con.query(qry)
+		var username = data["username"];
+		var check = "SELECT user from users";
+		var alreadyExists = "false";
+		con.query(check)
 			.on('error', console.error)
 			.on('data', function(result){
-				roomName = result.name;
-				socket.emit("room_names",{roomName:roomName, username:username}) 
-			});
-		socket.emit("display_user", {username:username}); //sends the username to the html so the html can access it for later use
+				name = result.user;
+				if (username == name){
+					console.log("it passed the if statement!")
+					socket.emit("username_already_exists", {username:username});//throw error bc username already exists
+					alreadyExists = "true"; //break
+				}
+			})	
+		if (alreadyExists == "false"){	
+			var insert = "INSERT INTO users (user) values ($1)";
+			con.query(insert, username)
+				.on('error', console.error);
+			console.log(username+' inserted into users');
+			
+			var qry = "SELECT name from rooms";
+			con.query(qry)
+				.on('error', console.error)
+				.on('data', function(result){
+					roomName = result.name;
+					socket.emit("room_names",{roomName:roomName, username:username}) 
+				});
+			socket.emit("display_user", {username:username}); //sends the username to the html so the html can access it for later use
+		}
 	});
 	
 	// NEW ROOM CAN BE CREATED
