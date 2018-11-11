@@ -60,7 +60,7 @@ io.on('connection', function (socket) {
 	// NEW ROOM CAN BE CREATED
 	socket.on("get_room_name", function(data){ //needs username
 
-		roomName = data["roomName"]; //this is a session variable. we may need to change this later
+		roomName = data["roomName"]; 
 		username = data["username"];
 		var sql = "INSERT INTO rooms (name, user) VALUES ($1, $2)";
 		var values = [roomName, username];
@@ -68,7 +68,7 @@ io.on('connection', function (socket) {
 			.on('error', console.error);
 		console.log(roomName+' inserted into db');
 
-		io.sockets.emit("room_names",{roomName:roomName, username:username}); //send the new roomname to the html
+		io.sockets.emit("room_names",{roomName:roomName}); //send the new roomname to the html //do not pass username as data
 	});
 
 	// INSERTS MESSAGE INTO DB

@@ -70,11 +70,10 @@
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(data){
         var roomName = data["roomName"];
-        var username = data["username"];
         var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
         btn.appendChild(document.createTextNode(roomName));
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
-
+        var username =  document.getElementById("username").textContent; //WRONG
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
           document.getElementById("chatlog").innerHTML = ""; // clear previous chat
@@ -148,7 +147,7 @@
       // LEAVE ROOM
       function leaveRoom(){ 
             var roomName = document.getElementById("room_title").textContent;
-            var username =  document.getElementById("username").textContent; //WRONG
+            var username =  document.getElementById("username").textContent; 
             document.getElementById("room_title").innerHTML = ""; // delete name
 
             document.getElementById("leave_room").style.visibility = "hidden";  // hide leave room button
