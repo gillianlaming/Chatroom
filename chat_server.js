@@ -54,7 +54,8 @@ io.on('connection', function (socket) {
 					alreadyExists = "true"; 
 					break;
 				}
-			})	
+			})
+		socket.emit()	
 		if (alreadyExists == "false"){	
 			console.log("the username does not exist");
 			var insert = "INSERT INTO users (user) values ($1)";
