@@ -68,7 +68,6 @@
 
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
-          document.getElementById("chatlog").innerHTML = ""; // clear previous chat
           //document.getElementById("users_list").innerHTML=""; //clears the users in the room
           socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
 
@@ -105,14 +104,22 @@
       });
       
       // Display all the messages in a room
-      socketio.on("display_message", function(data){
-          // get messages and append to chatlog  
-          var username = data['username']; var mess = data['message']; var time = data['timestamp'];  
-                // idk if timestamp is required, wouldnt be too hard to display, but if not required lets not
-          document.getElementById("chatlog").appendChild(document.createTextNode(username + ": "));
-          document.getElementById("chatlog").appendChild(document.createTextNode(mess));
-          document.getElementById("chatlog").appendChild(document.createElement('br'));
-          document.getElementById("chatlog").appendChild(document.createElement('br'));
+      socketio.on("display_messages", function(data){
+          document.getElementById("chatlog").innerHTML = ""; // clear previous chat
+          // get all messages and append to chatlog  
+          var messageList = data["messageList"];
+          var bigList = document.createElement("div");
+          for (var i=0; i<messageList.length; i++){
+            var username = messageList[i][0];
+            var message = messageList[i][1];
+            var time = messageList[i][2];
+            var element = document.createElement("p");
+            element.appendChild(document.createTextNode(username + ": "+message));
+            element.appendChild(document.createElement('br'));
+            bigList.appendChild(element);
+          }
+          
+          document.getElementById("chatlog").appendChild(bigList);
       });
 
       //banning a user and kicking a user out
@@ -193,11 +200,12 @@
       // SEND A MESSAGE
       function sendMessage(){
         var username = document.getElementById("name").textContent; //get the entered value of the username
-         var msg = document.getElementById("message_input").value;
-         var room = document.getElementById("room_title").textContent;
-         document.getElementById("message_input").value = ""; // reset form
+        var msg = document.getElementById("message_input").value;
+        var room = document.getElementById("room_title").textContent;
+        document.getElementById("message_input").value = ""; // reset form
 
-         socketio.emit("message_to_server", {message:msg, roomName:room, username:username}); // send message and username to sql //needs user
+        socketio.emit("message_to_server", {message:msg, roomName:room, username:username}); // send message and username to sql
+        socketio.emit("messages_in_room", {roomName:room}); // display messages
       }
 
     </script>

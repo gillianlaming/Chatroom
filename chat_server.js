@@ -97,11 +97,10 @@ io.on('connection', function (socket) {
 
 		var sql = "INSERT INTO messages (content, user, room_name) VALUES ($1, $2, $3)";
 		var values = [mess, username, roomName]; 
-			con.query(sql, values)
-				.on('error', console.error);  
-			console.log(mess+' inserted into '+roomName);
+		con.query(sql, values)
+			.on('error', console.error);  
 
-		io.sockets.emit("display_message",{message:mess, username:username, timestamp:'now'}) // broadcast the new message to other users  
+		console.log(mess+' inserted into '+roomName);
 	});
 	
 	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
@@ -114,19 +113,23 @@ io.on('connection', function (socket) {
 				socket.emit("display_users",{username:username, roomName:roomName}) //
 			})
 			.on('error', console.error); 	
-			
 	});
 
 	// GET ALL PREVIOUS MESSAGES IN A ROOM
 	socket.on("messages_in_room", function(data){
 		var roomName = data["roomName"];
-		var qry = ("SELECT * from messages where room_name = $1") 
+		var qry = ("SELECT * from messages where room_name = $1");
+		var messageList = new Array();
 		con.query(qry, roomName)
 			.on('data', function(result){
 				username = result.user;
 				mess = result.content;
 				time = result.timestamp;
-				socket.emit("display_message",{message:mess, username:username, timestamp:time}); // send messages to client
+				// add these to a list
+				messageList.push(new Array(username, mess, time));
+			})
+			.on('end', function(){
+				io.sockets.emit("display_messages",{messageList:messageList}); // send messages to all clients
 			})
 			.on('error', console.error); 	
 	});
