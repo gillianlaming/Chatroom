@@ -17,6 +17,7 @@
       <div id="theChatroom">
       <br><br>
         <div class="column left_column" id="left">
+            <p>your nickname is: <i id="name"></i></p>
             <button id="leave_room" onclick="leaveRoom()">leave this room</button>
           <div id="rooms_header">
             <h3>rooms:</h3>
@@ -36,7 +37,6 @@
         </div>
         
         <div class="column middle_column" id="middle">
-          <i id="name"></i>
           <h1>room <i id="room_title"></i></h1><!-- when room is selected, append room name to this -->
           <div id="chatlog"></div><!-- should load in previous messages in this room  -->
           <div id="messenger"> 
@@ -55,8 +55,6 @@
    </body>
 
    <script>
-     var loggedIn; 
-
       var socketio = io.connect();
       
       // DISPLAYS ROOM NAMES AS BUTTONS
@@ -65,16 +63,18 @@
         var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
         btn.appendChild(document.createTextNode(roomName));
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
-        var username =  document.getElementById("username").textContent; //WRONG
+
+        var username =  document.getElementById("name").textContent;
+
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
           document.getElementById("chatlog").innerHTML = ""; // clear previous chat
-          document.getElementById("users_list").innerHTML=""; //clears the users in the room
+          //document.getElementById("users_list").innerHTML=""; //clears the users in the room
           socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
 
           socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
           socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
-          loggedIn = "true";
+
           document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
           document.getElementById("rooms_header").style.visibility="hidden"; // hide header
           document.getElementById("rooms_list").style.visibility="hidden"; // hide room list 
@@ -95,14 +95,13 @@
 
       // Display all the users in a room
       socketio.on("display_users", function(data){
-          var username = data["username"];
+          var username = data["username"]; var roomName = data["roomName"]; var creator = data["creator"];
           var usrbtn = document.getElementById("users_list").appendChild(document.createElement("button"));
           usrbtn.appendChild(document.createTextNode(username + " "));
           document.getElementById("users_list").appendChild(document.createElement("br"));
           usrbtn.onclick = function(){
-            userOptions() //will be able to block an ban users, report users
-          };
-          
+            userOptions(username, roomName, creator); //will be able to block and ban users, report users
+          }
       });
       
       // Display all the messages in a room
@@ -116,10 +115,12 @@
           document.getElementById("chatlog").appendChild(document.createElement('br'));
       });
 
-      socketio.on("display_user", function(data){
-        var username = data["username"];
-        document.getElementById("username").appendChild(document.createTextNode(username)); //print username at the top of the page so we can access it later
-      });
+      //banning a user and kicking a user out
+      function userOptions(username, roomName, creator){
+        console.log("user options for user "+username+" in room "+roomName+" which was created by "+creator);
+        // get the username of who created this room
+        // if logged in as creator, you are able to kick out / ban this user
+      }
 
       socketio.on("remove_user", function(data){  //remove username button
         var username = data["username"];
@@ -138,31 +139,23 @@
       });
 
       socketio.on("username_already_exists", function(data){
-        username = data["username"];
+        var username = data["username"];
         console.log("username already exists");
         alert("The username "+ username +" already exists. Please choose another.")
-        console.log("username already exists");
+        document.getElementById("username").value = ""; // reset form
       });
 
       socketio.on("configure_display", function(data){
-        username = data["username"];
+        var username = data["username"];
         document.getElementById("name").innerHTML = username;
-        document.getElementById("name").style.visibility = "hidden";
         document.getElementById("getUsername").style.visibility = "hidden";
         document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
-        document.getElementById("username").value = ""; // reset form
-      })
-
-      //banning a user and kicking a user out
-      function userOptions(){
-        console.log("user options")  
-      }
+      });
 
       // LEAVE ROOM
       function leaveRoom(){ 
             var roomName = document.getElementById("room_title").textContent;
             var username =  document.getElementById("username").textContent; 
-            document.getElementById("room_title").innerHTML = ""; // delete name
 
             document.getElementById("leave_room").style.visibility = "hidden";  // hide leave room button
             document.getElementById("rooms_header").style.visibility = "visible";// show rooms header and rooms list
@@ -180,11 +173,7 @@
       function sendUsername(){
         var username = document.getElementById("username").value; //get the entered value of the username
         socketio.emit('little_newbie', {username:username}); //send the username to server
-        // document.getElementById("name").innerHTML = username;
-        // document.getElementById("name").style.visibility = "hidden";
-        // document.getElementById("getUsername").style.visibility = "hidden";
-        // document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
-        // document.getElementById("username").value = ""; // reset form
+        document.getElementById("username").value = ""; // reset form
       }
 
 

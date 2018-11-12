@@ -1,24 +1,22 @@
 # README #
 
+
+###ISSUES:
+- enter, leave, enter again, leave, enter again -- nothing displays
+- leaving a room does not remove the user from the list
+- somehow leaving a room adds the first user to the top of the list?
+
 ###Todos:
-
-##HI YES I MERGED SO ALL NEW ISSUES NOW YAY!
-
-####ISSUES:
-- doing multiple things. e.g. entering, leaving, entering again, sending a message, weird shit starts happening
-- multiple tabs is alllll fucked up
 
 ######Gillian:
 - if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
-- throw error if username already exists (!!!!!!!!)
 - slide into dms
 - if room is private, we need a dialog box for password, and then pass that to sql
 - if a user wants to enter a room that is private, dialog box to submit password and then check that w the sql
 - chat creators 
 
 ######Leela:
-- remove users from database whsen they leave the site!!
-- if a user's username isn't unique, there will be hella errors (we need to iterate thru sql and alert if the username already exists)
+- remove users from database when they leave the site!!
 
 ######later to dos:
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
