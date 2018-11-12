@@ -144,6 +144,15 @@
         console.log("username already exists");
       });
 
+      socketio.on("configure_display", function(data){
+        username = data["username"];
+        document.getElementById("name").innerHTML = username;
+        document.getElementById("name").style.visibility = "hidden";
+        document.getElementById("getUsername").style.visibility = "hidden";
+        document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
+        document.getElementById("username").value = ""; // reset form
+      })
+
       //banning a user and kicking a user out
       function userOptions(){
         console.log("user options")  
@@ -170,15 +179,14 @@
       // LOG IN
       function sendUsername(){
         var username = document.getElementById("username").value; //get the entered value of the username
-        document.getElementById("name").innerHTML = username;
-        document.getElementById("name").style.visibility = "hidden";
-        document.getElementById("getUsername").style.visibility = "hidden";
-        document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
-        document.getElementById("username").value = ""; // reset form
-
         socketio.emit('little_newbie', {username:username}); //send the username to server
-
+        // document.getElementById("name").innerHTML = username;
+        // document.getElementById("name").style.visibility = "hidden";
+        // document.getElementById("getUsername").style.visibility = "hidden";
+        // document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
+        // document.getElementById("username").value = ""; // reset form
       }
+
 
       // NEW ROOM
       function addRoom(){

@@ -43,7 +43,7 @@ io.on('connection', function (socket) {
     socket.on('little_newbie', function(data) {
 		var username = data["username"];
 		var check = "SELECT user from users";
-		var alreadyExists = "true";
+		var alreadyExists = "false";
 		con.query(check) //i think this is going to have to be in a different function
 			.on('error', console.error)
 			.on('data', function(result){
@@ -51,12 +51,12 @@ io.on('connection', function (socket) {
 				if (username == name){
 					console.log("it passed the if statement!")
 					socket.emit("username_already_exists", {username:username}); //throw error bc username already exists
-					alreadyExists = "true"; 
-					break;
+					alreadyExists = "true";
 				}
+			console.log(username);	
 			})
-		socket.emit()	
-		if (alreadyExists == "false"){	
+
+		if (alreadyExists == "false"){	//this isnt working bc of the order in which the code is run. it does the if statement and then the query
 			console.log("the username does not exist");
 			var insert = "INSERT INTO users (user) values ($1)";
 			con.query(insert, username)
@@ -70,6 +70,7 @@ io.on('connection', function (socket) {
 					roomName = result.name;
 					socket.emit("room_names",{roomName:roomName, username:username}) 
 				});
+			socket.emit("configure_display", {username:username});
 			socket.emit("display_user", {username:username}); //sends the username to the html so the html can access it for later use
 		}
 		else{
