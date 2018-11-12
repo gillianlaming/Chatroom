@@ -43,15 +43,16 @@ io.on('connection', function (socket) {
     socket.on('little_newbie', function(data) {
 		var username = data["username"];
 		var check = "SELECT user from users";
-		var alreadyExists = "false";
-		con.query(check)
+		var alreadyExists = "true";
+		con.query(check) //i think this is going to have to be in a different function
 			.on('error', console.error)
 			.on('data', function(result){
 				name = result.user;
 				if (username == name){
 					console.log("it passed the if statement!")
-					socket.emit("username_already_exists", {username:username});//throw error bc username already exists
-					alreadyExists = "true"; //break
+					socket.emit("username_already_exists", {username:username}); //throw error bc username already exists
+					alreadyExists = "true"; 
+					break;
 				}
 			})	
 		if (alreadyExists == "false"){	
@@ -69,6 +70,9 @@ io.on('connection', function (socket) {
 					socket.emit("room_names",{roomName:roomName, username:username}) 
 				});
 			socket.emit("display_user", {username:username}); //sends the username to the html so the html can access it for later use
+		}
+		else{
+
 		}
 	});
 	
