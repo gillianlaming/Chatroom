@@ -55,6 +55,7 @@ io.on('connection', function (socket) {
 				}
 			})	
 		if (alreadyExists == "false"){	
+			console.log("the username does not exist");
 			var insert = "INSERT INTO users (user) values ($1)";
 			con.query(insert, username)
 				.on('error', console.error);
