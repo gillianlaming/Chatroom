@@ -2,6 +2,7 @@
 
 ###ISSUES:
 - no incorrect password alert
+- server side js stops working after inserting info into banned db? it inserts, then next time a user tries to enter a room, nothing happens. really confused about this one. 
 
 ###Todos:
 

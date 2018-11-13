@@ -89,8 +89,8 @@
 
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
+          console.log(username+" is trying to enter "+roomName);
           socketio.emit("is_there_password", {username:username, roomName:roomName, creator:creator});          
-          //socketio.emit("check_for_ban", {roomName:roomName, username:username});
         }
         //   window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         //     console.log("page was reloaded")
@@ -188,6 +188,8 @@
         console.log("banning "+username+" from "+roomName);
        
         socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user
+
+        console.log(username+" successfully removed from "+roomName);
         
         document.getElementById("popUpOptions").style.visibility = "hidden";
         document.getElementById("theChatroom").style.display = "block";

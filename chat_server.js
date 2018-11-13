@@ -155,20 +155,35 @@ io.on('connection', function (socket) {
 			})
 			.on('error', console.error);
 	});
+
 	socket.on("is_there_password", function(data){
+		console.log("entered is_there_password");
 		var roomName = data["roomName"];
 		var username = data["username"];
 		var creator = data["creator"];
-		console.log("looking for password in "+roomName)
+
 		var qry = ("SELECT password from rooms where name = $1");
 		con.query(qry, roomName)
 			.on('data', function(result){
 				pass = result.password;
-
-				if (pass == 'yeet'){
-					socket.emit("enter_room", {username:username, roomName:roomName, creator:creator}); //just let them enter the room already!!
-				}
-				else{
+				if (pass == 'yeet'){ // no password
+					console.log("checking to see if "+username+" has been banned from "+roomName);
+					// see if user is banned from this room
+					var q = "SELECT * from banned where username = $1";
+					con.query(q, username)
+						.on('data', function(result){
+							if (result.room1 == roomName || result.room2 == roomName){
+								console.log(username+" is banned from this room!");
+								//io.sockets.emit("you_are_banned", {username:username, roomName:roomName});
+							}
+						})
+						.on('end', function(){
+							console.log(username+" is not banned from "+roomName);
+							socket.emit("enter_room", {username:username, roomName:roomName, creator:creator}); //just let them enter the room already!!
+						})
+						.on('error', console.error);
+					}
+				else{ // has password
 					socket.emit("ask_for_password", {username:username, roomName:roomName, creator:creator}); 
 				}
 			})
@@ -254,22 +269,6 @@ io.on('connection', function (socket) {
 				}
 				else {
 					console.log("more than 2 banned rooms already!");
-				}
-			})
-			.on('error', console.error);
-	});
-
-	socket.on("check_for_ban", function(data){
-		var roomName = data["roomName"];
-		var username = data["username"];
-		console.log("checking to see if "+username+" has been banned from "+roomName);
-		// see if user is banned from any rooms
-		var q = "SELECT * from banned where username = $1";
-		con.query(q, username)
-			.on('data', function(result){
-				if (result.room1 == roomName || result.room2 == roomName){
-					console.log(username+" is banned from this room!");
-					//io.sockets.emit("ban_on_click", {username:username, roomName:roomName});
 				}
 			})
 			.on('error', console.error);
