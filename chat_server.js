@@ -16,19 +16,17 @@ app.set('views', __dirname + '/views');
 
 	
 con.query("CREATE TABLE IF NOT EXISTS rooms ( name varchar(255) PRIMARY KEY, messages mediumtext, password varchar(255) DEFAULT NULL, user varchar(255));")
-	.on('end', function(){
-		console.log('Made rooms table'); })
 	.on('error', console.error);
 
 con.query("CREATE TABLE IF NOT EXISTS messages ( id INTEGER PRIMARY KEY AUTOINCREMENT, content mediumtext NOT NULL, timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, user varchar(255) NOT NULL, room_name varchar(255) DEFAULT NULL, FOREIGN KEY (room_name) REFERENCES rooms (name));")
-	.on('end', function(){
-		console.log('Made messages table'); })
 	.on('error', console.error);
 
 con.query("CREATE TABLE IF NOT EXISTS users ( user varchar(255) NOT NULL, id INTEGER PRIMARY KEY AUTOINCREMENT, room varchar(255) DEFAULT NULL);")
-	.on('end', function(){
-		console.log('Made messages table'); })
 	.on('error', console.error);
+
+con.query("CREATE TABLE IF NOT EXISTS banned ( username varchar(255) NOT NULL, room1 varchar(255) DEFAULT NULL, room2 varchar(255) DEFAULT NULL);")
+	.on('error', console.error);
+
 
 // on load, display client.html
 app.get('/', function(request, response){
@@ -62,12 +60,13 @@ io.on('connection', function (socket) {
 						.on('error', console.error);
 					console.log(username+' inserted into users');
 					
-					var qry = "SELECT name from rooms";
+					var qry = "SELECT * from rooms";
 					con.query(qry)
 						.on('error', console.error)
 						.on('data', function(result){
-							roomName = result.name;
-							socket.emit("room_names",{roomName:roomName, username:username}) 
+							var roomName = result.name;
+							var creator = result.user;
+							socket.emit("room_names",{roomName:roomName, username:username, creator:creator});
 						});
 					socket.emit("configure_display", {username:username});
 					//sends the username to the html so the html can access it for later use
@@ -105,7 +104,7 @@ io.on('connection', function (socket) {
 			.on('error', console.error);
 		console.log(roomName+' inserted into db');
 
-		io.sockets.emit("room_names",{roomName:roomName}); //send the new roomname to the html
+		io.sockets.emit("room_names",{roomName:roomName, creator:username}); //send the new roomname to the html
 	});
 
 	// INSERTS MESSAGE INTO DB
@@ -132,13 +131,7 @@ io.on('connection', function (socket) {
 				usersList.push(result.user); // add all users to a list
 			})
 			.on('end', function(){
-				var sql1 = "SELECT user from rooms where name = $1"; // figure out who created the room
-				con.query(sql1, roomName)
-					.on('data', function(result){
-						var creator = result.user;
-						socket.emit("display_users",{usersList:usersList, roomName:roomName, creator:creator});
-					})
-					.on('error', console.error);
+				socket.emit("display_users",{usersList:usersList, roomName:roomName});
 			})
 			.on('error', console.error); 	
 	});
@@ -179,13 +172,12 @@ io.on('connection', function (socket) {
 				}
 			})
 			.on('error', console.error);
-		
-		
 	})
 	// ADDS USER TO ROOM DB
 	socket.on("add_user_to_room", function(data){ //needs username
 		var roomName = data["roomName"];
 		var username = data["username"];
+
 		var sql = "UPDATE users SET room = $1 WHERE user = $2"; 
 		var values = [roomName, username];
 		con.query(sql, values)
@@ -202,7 +194,7 @@ io.on('connection', function (socket) {
 		var sql = "UPDATE users SET room = 'NULL' WHERE user = $1";
 		con.query(sql, username)
 			.on('error', console.error); 
-		//console.log('removed '+username+' from room '+roomName);
+		console.log('removed '+username+' from room '+roomName);
 		io.sockets.emit("remove_user", {username:username, roomName:roomName});
 	});
 
@@ -215,6 +207,71 @@ io.on('connection', function (socket) {
 		con.query(sql, values)
 			.on('error', console.error);
 		console.log("updated "+ roomName +" to have password "+ password);
+	});
+	// check if user has been kicked out
+	socket.on("check_for_kick", function(data){
+		console.log("kick????");
+		
+		var roomName = data["roomName"];
+		var username = data["username"];
+		
+		io.sockets.emit("kick", {username:username, roomName:roomName});
+	});
+
+	// Adds bans on users to db
+	socket.on("ban", function(data){
+		var roomName = data["roomName"];
+		var username = data["username"];
+		console.log("banning "+username +" from "+roomName);
+		var banned_num = 0;
+		// see if user is already banned from any rooms
+		var q = "SELECT * from banned where username = $1";
+		con.query(q, username)
+			.on('data', function(result){
+				if (result.room1 != null){
+					banned_num++;
+				}
+				if (result.room2 != null){
+					banned_num++;
+				}
+			})
+			.on('end', function(){
+				if (banned_num == 0){
+					// insert username and roomname into banned table
+					var sql = "INSERT INTO banned (username, room1) VALUES ($1, $2)";
+					con.query(sql, [username, roomName])
+						.on('error', console.error);
+
+					console.log("added "+username+" to banned db");
+				}
+				else if (banned_num == 1){
+					var sql = "UPDATE banned SET room2 = $1 WHERE username = $2";
+					con.query(sql, [roomName, username])
+						.on('error', console.error);
+
+					console.log("updated "+username+" in banned db");
+				}
+				else {
+					console.log("more than 2 banned rooms already!");
+				}
+			})
+			.on('error', console.error);
+	});
+
+	socket.on("check_for_ban", function(data){
+		var roomName = data["roomName"];
+		var username = data["username"];
+		console.log("checking to see if "+username+" has been banned from "+roomName);
+		// see if user is banned from any rooms
+		var q = "SELECT * from banned where username = $1";
+		con.query(q, username)
+			.on('data', function(result){
+				if (result.room1 == roomName || result.room2 == roomName){
+					console.log(username+" is banned from this room!");
+					//io.sockets.emit("ban_on_click", {username:username, roomName:roomName});
+				}
+			})
+			.on('error', console.error);
 	});
 
 });
