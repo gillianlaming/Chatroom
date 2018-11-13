@@ -38,6 +38,7 @@
         
         <div class="column middle_column" id="middle">
           <h1>room <i id="room_title"></i></h1><!-- when room is selected, append room name to this -->
+          <h6>created by: <i id="room_creator"></i></h6>
           <div id="chatlog"></div><!-- should load in previous messages in this room  -->
           <div id="messenger"> 
             <input type="text" id="message_input"/>
@@ -52,11 +53,14 @@
             </ul>
         </div>
       </div>
-      <div id="popUpPass">
+          <div id="popUpPass">
             <input type="password" name="password" id="password" placeholder="password" required><br> 
             <input type="submit" name="submit" id ="submit_pass" value="Set Password"><br><br>
           </div>
-      </div>
+          <div id="popUpOptions">
+            <button id="ban_button"></button><br> 
+            <button id="kick_button"></button><br><br>
+          </div>
    </body>
 
    <script>
@@ -64,12 +68,13 @@
       
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(data){
-        var roomName = data["roomName"];
+        var roomName = data["roomName"]; var creator = data["creator"];
         var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
         btn.appendChild(document.createTextNode(roomName));
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
 
         var username =  document.getElementById("name").textContent;
+        
 
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
@@ -85,6 +90,7 @@
           document.getElementById("middle").style.visibility = "visible"; // show chatroom
           document.getElementById("right").style.visibility = "visible"; // show users list
           document.getElementById("room_title").innerHTML = roomName; // show name
+          document.getElementById("room_creator").innerHTML = creator;
         }
         //   window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         //     console.log("page was reloaded")
@@ -100,7 +106,7 @@
           document.getElementById("users_list").innerHTML=""; // clears previous
           var roomName = data["roomName"]; 
           var usersList = data["usersList"];
-          var creator = data["creator"];
+          var creator = document.getElementById("room_creator").textContent;
           var bigList = document.createElement("div");
           for (var i=0; i<usersList.length; i++){
             var username = usersList[i];
@@ -121,14 +127,57 @@
 
       //banning a user and kicking a user out
       function userOptions(username, creator, roomName){
-        console.log("user options for "+username+" in "+roomName+" which was created by "+creator);
-        // get the username of who created this room
         // if logged in as creator, you are able to kick out / ban this user
         var me = document.getElementById("name").textContent;
-        if (me == creator){
-          alert("you are the owner of this room!");
+        if (me != creator){
+          alert("you are not the creator of this room, so you can't ban users.");
+        }
+        else {
+          document.getElementById("ban_button").innerHTML = "ban " + username;
+          document.getElementById("ban_button").onclick = function(){
+            ban(username, roomName);
+          }
+          document.getElementById("kick_button").innerHTML = "kick out " + username;
+          document.getElementById("kick_button").onclick = function(){
+            kick(username, roomName);
+          }
+          document.getElementById("popUpOptions").style.visibility = "visible";
+          document.getElementById("theChatroom").style.display = "none";
         }
       }
+      
+      // User is added to room's banned list
+      function ban(username, roomName){
+        console.log("banning "+username+" from "+roomName);
+      }
+      
+      // User is removed from room right now, but can join again
+      function kick(username, roomName){
+        console.log("kicking "+username+" out of "+roomName);
+        socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user //need to pass username
+     
+        document.getElementById("popUpOptions").style.visibility = "hidden";
+        document.getElementById("theChatroom").style.display = "block";
+        
+        socketio.emit("check_for_kick", {roomName:roomName, username:username});
+      }
+
+      // After someone has been kicked out, check to see if it was you
+      socketio.on("kick", function(data){
+        var roomName = data["roomName"];
+        var username = data['username'];
+        console.log("kick function called on "+username);
+
+        if (document.getElementById("name").textContent == username && document.getElementById("room_title").textContent == roomName){
+            alert("you have been kicked out of "+roomName);
+            document.getElementById("leave_room").style.visibility = "hidden";  // hide leave room button
+            document.getElementById("rooms_header").style.visibility = "visible";// show rooms header and rooms list
+            document.getElementById("rooms_list").style.visibility = "visible";
+            document.getElementById("new_room_stuff").style.visibility = "visible"; // show add room button
+            document.getElementById("middle").style.visibility = "hidden"; 
+            document.getElementById("right").style.visibility = "hidden"; // hide middle and right column 
+        }
+      });
 
       // Display all the messages in a room
       socketio.on("display_messages", function(data){
@@ -172,6 +221,7 @@
       socketio.on("add_new_user", function(data){
         var username = data["username"];
         var roomName = data["roomName"];
+        var creator = document.getElementById("room_creator").textContent;
         if (document.getElementById("room_title").textContent == roomName){
             var element = document.createElement("button");
             element.appendChild(document.createTextNode(username));
@@ -211,6 +261,7 @@
       socketio.on("configure_display", function(data){
         var username = data["username"];
         document.getElementById("name").innerHTML = username;
+        
         document.getElementById("getUsername").style.visibility = "hidden";
         document.getElementById("left").style.visibility = "visible"; // only left is visible, middle and right become visble when we enter a room
       });
@@ -218,7 +269,7 @@
       // LEAVE ROOM
       function leaveRoom(){ 
             var roomName = document.getElementById("room_title").textContent;
-            var username =  document.getElementById("name").textContent; 
+            var username = document.getElementById("name").textContent;
 
             document.getElementById("leave_room").style.visibility = "hidden";  // hide leave room button
             document.getElementById("rooms_header").style.visibility = "visible";// show rooms header and rooms list
@@ -226,8 +277,6 @@
             document.getElementById("new_room_stuff").style.visibility = "visible"; // show add room button
             document.getElementById("middle").style.visibility = "hidden"; 
             document.getElementById("right").style.visibility = "hidden"; // hide middle and right column 
-
-            //document.getElementById("users_list").innerHTML = ""; // remove all users from list ISSUE
 
             socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user //need to pass username
       }

@@ -62,12 +62,13 @@ io.on('connection', function (socket) {
 						.on('error', console.error);
 					console.log(username+' inserted into users');
 					
-					var qry = "SELECT name from rooms";
+					var qry = "SELECT * from rooms";
 					con.query(qry)
 						.on('error', console.error)
 						.on('data', function(result){
-							roomName = result.name;
-							socket.emit("room_names",{roomName:roomName, username:username}) 
+							var roomName = result.name;
+							var creator = result.user;
+							socket.emit("room_names",{roomName:roomName, username:username, creator:creator});
 						});
 					socket.emit("configure_display", {username:username});
 					//sends the username to the html so the html can access it for later use
@@ -85,7 +86,7 @@ io.on('connection', function (socket) {
 			.on('error', console.error);
 		console.log(roomName+' inserted into db');
 
-		io.sockets.emit("room_names",{roomName:roomName}); //send the new roomname to the html
+		io.sockets.emit("room_names",{roomName:roomName, creator:username}); //send the new roomname to the html
 	});
 
 	// INSERTS MESSAGE INTO DB
@@ -112,13 +113,7 @@ io.on('connection', function (socket) {
 				usersList.push(result.user); // add all users to a list
 			})
 			.on('end', function(){
-				var sql1 = "SELECT user from rooms where name = $1"; // figure out who created the room
-				con.query(sql1, roomName)
-					.on('data', function(result){
-						var creator = result.user;
-						socket.emit("display_users",{usersList:usersList, roomName:roomName, creator:creator});
-					})
-					.on('error', console.error);
+				socket.emit("display_users",{usersList:usersList, roomName:roomName});
 			})
 			.on('error', console.error); 	
 	});
@@ -164,6 +159,16 @@ io.on('connection', function (socket) {
 			.on('error', console.error); 
 		//console.log('removed '+username+' from room '+roomName);
 		io.sockets.emit("remove_user", {username:username, roomName:roomName});
+	});
+
+	// check if user has been kicked out
+	socket.on("check_for_kick", function(data){
+		console.log("kick????");
+		
+		var roomName = data["roomName"];
+		var username = data["username"];
+		
+		io.sockets.emit("kick", {username:username, roomName:roomName});
 	});
 
 });
