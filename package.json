@@ -6,6 +6,7 @@
   "dependencies": {
     "any-db": "2.1.x",
     "any-db-sqlite3": "^2.1.4",
+    "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
     "consolidate": "0.13.x",
     "errorhandler": "^1.5.0",

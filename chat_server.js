@@ -8,6 +8,7 @@ var con = anyDB.createConnection('sqlite3://chatroom.db');
 var engines = require('consolidate');
 var server = http.createServer(app);
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt');
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 app.engine('html', engines.hogan); 
@@ -78,13 +79,12 @@ io.on('connection', function (socket) {
 		var username = data["username"];
 		var password = data["password"];
 		var creator = data["creator"];
-
+		
 		var qry = ("SELECT password from rooms where name = $1");
 		con.query(qry, roomName)
 			.on('data', function(result){
 				pass = result.password;
-
-				if (pass == password){
+				if ((bcrypt.compareSync(password, pass))){
 					console.log("password is correct!!!");
 					socket.emit("enter_room", {username:username, roomName:roomName, creator:creator}); //just let them enter the room already!!
 				}
@@ -157,7 +157,6 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on("is_there_password", function(data){
-		console.log("entered is_there_password");
 		var roomName = data["roomName"];
 		var username = data["username"];
 		var creator = data["creator"];
@@ -166,6 +165,10 @@ io.on('connection', function (socket) {
 		con.query(qry, roomName)
 			.on('data', function(result){
 				pass = result.password;
+				if(bcrypt.compareSync('yeet', pass)) {
+					pass = "yeet";
+					console.log("password is yeet");
+				}
 				if (pass == 'yeet'){ // no password
 					console.log("checking to see if "+username+" has been banned from "+roomName);
 					// see if user is banned from this room
@@ -218,11 +221,13 @@ io.on('connection', function (socket) {
 	socket.on("set_password", function(data){
 		var password = data["password"];
 		var roomName = data["roomName"];
+		var hash = bcrypt.hashSync(password, 10); //hash the password to store in sql
+		console.log(hash)
 		var sql = "UPDATE rooms SET password = $1 WHERE name = $2";
-		var values = [password, roomName];
+		var values = [hash, roomName];
 		con.query(sql, values)
 			.on('error', console.error);
-		console.log("updated "+ roomName +" to have password "+ password);
+		console.log("updated "+ roomName +" to have password "+ hash);
 	});
 	// check if user has been kicked out
 	socket.on("check_for_kick", function(data){
