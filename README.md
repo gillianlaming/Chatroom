@@ -5,6 +5,7 @@
 - server side js stops working after inserting info into banned db? it inserts, then next time a user tries to enter a room, nothing happens. really confused about this one. 
 
 ###Todos:
+- cancel button for password
 
 ######Gillian:
 - slide into dms
@@ -16,7 +17,6 @@
 - if banned from more than 2 rooms, get kicked off the site! (aka reload)
 
 ######later to dos:
-- rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
 - room creators can ban people from rooms
 - also temporarily block
 - rooms can be private
