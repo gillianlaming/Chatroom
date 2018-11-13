@@ -1,6 +1,5 @@
 # README #
 
-
 ###ISSUES:
 - enter, leave, enter again, leave, enter again -- nothing displays
 - leaving a room does not remove the user from the list

@@ -53,11 +53,16 @@ p{
 }
 
 #chatlog{
-    overflow-y: scroll;
     border-left: 2px solid lightskyblue;
     padding-left: 7px;
+    max-height: 450px;
+    overflow-y: scroll;
 }
 
+
+#chatlog p{
+    margin: 5px 0;
+}
 .column h3{
     margin-bottom: -10px;
 }

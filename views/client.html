@@ -68,10 +68,8 @@
 
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
-          //document.getElementById("users_list").innerHTML=""; //clears the users in the room
-          socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
-
           socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
+          socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
           socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
 
           document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
@@ -82,52 +80,90 @@
           document.getElementById("middle").style.visibility = "visible"; // show chatroom
           document.getElementById("right").style.visibility = "visible"; // show users list
           document.getElementById("room_title").innerHTML = roomName; // show name
-
+        }
         //   window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         //     console.log("page was reloaded")
         //     socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //need to pass username
         //     leaveRoom();
         //     socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
         //     });
-        }
+        
       });
 
       // Display all the users in a room
       socketio.on("display_users", function(data){
-          var username = data["username"]; var roomName = data["roomName"]; var creator = data["creator"];
-          var usrbtn = document.getElementById("users_list").appendChild(document.createElement("button"));
-          usrbtn.appendChild(document.createTextNode(username + " "));
-          document.getElementById("users_list").appendChild(document.createElement("br"));
-          usrbtn.onclick = function(){
-            userOptions(username, roomName, creator); //will be able to block and ban users, report users
-          }
-      });
-      
-      // Display all the messages in a room
-      socketio.on("display_messages", function(data){
-          document.getElementById("chatlog").innerHTML = ""; // clear previous chat
-          // get all messages and append to chatlog  
-          var messageList = data["messageList"];
+          document.getElementById("users_list").innerHTML=""; // clears previous
+          var roomName = data["roomName"]; 
+          var usersList = data["usersList"];
+          var creator = data["creator"];
           var bigList = document.createElement("div");
-          for (var i=0; i<messageList.length; i++){
-            var username = messageList[i][0];
-            var message = messageList[i][1];
-            var time = messageList[i][2];
-            var element = document.createElement("p");
-            element.appendChild(document.createTextNode(username + ": "+message));
-            element.appendChild(document.createElement('br'));
-            bigList.appendChild(element);
+          for (var i=0; i<usersList.length; i++){
+            var username = usersList[i];
+            var element = document.createElement("button");
+            element.appendChild(document.createTextNode(username));
+
+            element.onclick = function(){ // pass username, creator, and room name to user options
+              userOptions(this.textContent, creator, roomName);
+            }
+
+            bigList.appendChild(element); 
+            bigList.appendChild(document.createElement('br'));
           }
-          
-          document.getElementById("chatlog").appendChild(bigList);
+          if (document.getElementById("room_title").textContent == roomName){
+            document.getElementById("users_list").appendChild(bigList);
+          }
       });
 
       //banning a user and kicking a user out
-      function userOptions(username, roomName, creator){
-        console.log("user options for user "+username+" in room "+roomName+" which was created by "+creator);
+      function userOptions(username, creator, roomName){
+        console.log("user options for "+username+" in "+roomName+" which was created by "+creator);
         // get the username of who created this room
         // if logged in as creator, you are able to kick out / ban this user
+        var me = document.getElementById("name").textContent;
+        if (me == creator){
+          alert("you are the owner of this room!");
+        }
       }
+
+      // Display all the messages in a room
+      socketio.on("display_messages", function(data){
+          var roomName = data["roomName"];
+          if (document.getElementById("room_title").textContent == roomName){
+              console.log("in room "+roomName);
+              document.getElementById("chatlog").innerHTML = ""; // clear previous chat
+              // get all messages and append to chatlog  
+              var messageList = data["messageList"];
+              var bigList = document.createElement("div");
+
+              for (var i=0; i<messageList.length; i++){
+                var username = messageList[i][0];
+                var message = messageList[i][1];
+                var time = messageList[i][2];
+                var element = document.createElement("p");
+                element.appendChild(document.createTextNode(username + ":    "+message));
+                element.appendChild(document.createElement('br'));
+                bigList.appendChild(element);
+              }
+              
+              document.getElementById("chatlog").appendChild(bigList);
+              scrollDown();
+          }
+      });
+
+      socketio.on("new_message", function(data){
+        var username = data["username"];
+        var roomName = data["roomName"];
+        var message = data["message"];
+
+        if (document.getElementById("room_title").textContent == roomName){
+            console.log("new message "+message+" in "+roomName);
+            var element = document.createElement("p");
+            element.appendChild(document.createTextNode(username + ":    "+message));
+            element.appendChild(document.createElement('br'));
+            document.getElementById("chatlog").appendChild(element);
+            scrollDown();
+        }
+      });
 
       socketio.on("remove_user", function(data){  //remove username button
         var username = data["username"];
@@ -183,7 +219,6 @@
         document.getElementById("username").value = ""; // reset form
       }
 
-
       // NEW ROOM
       function addRoom(){
           var roomName = document.getElementById("room_name").value;
@@ -206,6 +241,10 @@
 
         socketio.emit("message_to_server", {message:msg, roomName:room, username:username}); // send message and username to sql
         socketio.emit("messages_in_room", {roomName:room}); // display messages
+      }
+      
+      function scrollDown() { // scrolls the box to the bottom
+        document.getElementById('chatlog').scrollTop = document.getElementById('chatlog').scrollHeight;
       }
 
     </script>

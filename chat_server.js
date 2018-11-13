@@ -76,8 +76,7 @@ io.on('connection', function (socket) {
 	});
 	
 	// NEW ROOM CAN BE CREATED
-	socket.on("get_room_name", function(data){ //needs username
-
+	socket.on("get_room_name", function(data){ 
 		roomName = data["roomName"]; 
 		username = data["username"];
 		var sql = "INSERT INTO rooms (name, user) VALUES ($1, $2)";
@@ -86,7 +85,7 @@ io.on('connection', function (socket) {
 			.on('error', console.error);
 		console.log(roomName+' inserted into db');
 
-		io.sockets.emit("room_names",{roomName:roomName}); //send the new roomname to the html //do not pass username as data
+		io.sockets.emit("room_names",{roomName:roomName}); //send the new roomname to the html
 	});
 
 	// INSERTS MESSAGE INTO DB
@@ -100,17 +99,26 @@ io.on('connection', function (socket) {
 		con.query(sql, values)
 			.on('error', console.error);  
 
-		console.log(mess+' inserted into '+roomName);
+		io.sockets.emit('new_message', {message:mess, roomName:roomName, username:username}); // new messages must be broadcasted to all users
 	});
 	
 	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
 	socket.on("users_in_room", function(data){
 		var roomName = data["roomName"];
-		var qry = ("SELECT user from users where room = $1") 
+		var qry = ("SELECT user from users where room = $1");
+		var usersList = new Array();
 		con.query(qry, roomName)
 			.on('data', function(result){
-				username = result.user;
-				socket.emit("display_users",{username:username, roomName:roomName}) //
+				usersList.push(result.user); // add all users to a list
+			})
+			.on('end', function(){
+				var sql1 = "SELECT user from rooms where name = $1"; // figure out who created the room
+				con.query(sql1, roomName)
+					.on('data', function(result){
+						var creator = result.user;
+						socket.emit("display_users",{usersList:usersList, roomName:roomName, creator:creator});
+					})
+					.on('error', console.error);
 			})
 			.on('error', console.error); 	
 	});
@@ -129,9 +137,9 @@ io.on('connection', function (socket) {
 				messageList.push(new Array(username, mess, time));
 			})
 			.on('end', function(){
-				io.sockets.emit("display_messages",{messageList:messageList}); // send messages to all clients
+				socket.emit("display_messages",{messageList:messageList, roomName:roomName});
 			})
-			.on('error', console.error); 	
+			.on('error', console.error);
 	});
 
 	// ADDS USER TO ROOM DB
@@ -142,17 +150,8 @@ io.on('connection', function (socket) {
 		var values = [roomName, username];
 		con.query(sql, values)
 			.on('error', console.error);
-		console.log('updated '+roomName+' db to include '+username);
 
-		var sql1 = "SELECT user from rooms where name = $1";
-		con.query(sql1, roomName)
-			.on('data', function(result){
-				var creator = result.user;
-				console.log('the creator of room '+roomName+" is "+creator);
-		
-				io.sockets.emit("display_users", {username:username, roomName:roomName, creator:creator}); 
-			})
-			.on('error', console.error);
+		console.log('updated '+roomName+' db to include '+username);
 	});
 
 	// REMOVES USER FROM ROOM DB 
