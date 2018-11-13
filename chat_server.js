@@ -50,7 +50,7 @@ io.on('connection', function (socket) {
 				var name = result.user;
 				if (username == name){
 					exists = true;
-					console.log(username +" is the same as "+name+" which is already in db");
+					//console.log(username +" is the same as "+name+" which is already in db");
 					socket.emit("username_already_exists", {username:username}); //throw error bc username already exists
 				}
 			})
@@ -151,7 +151,8 @@ io.on('connection', function (socket) {
 		con.query(sql, values)
 			.on('error', console.error);
 
-		console.log('updated '+roomName+' db to include '+username);
+		//console.log('updated '+roomName+' db to include '+username);
+		io.sockets.emit("add_new_user", {username:username, roomName:roomName});
 	});
 
 	// REMOVES USER FROM ROOM DB 
@@ -161,7 +162,7 @@ io.on('connection', function (socket) {
 		var sql = "UPDATE users SET room = 'NULL' WHERE user = $1";
 		con.query(sql, username)
 			.on('error', console.error); 
-		console.log('removed '+username+' from room '+roomName);
+		//console.log('removed '+username+' from room '+roomName);
 		io.sockets.emit("remove_user", {username:username, roomName:roomName});
 	});
 

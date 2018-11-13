@@ -101,7 +101,7 @@
             var username = usersList[i];
             var element = document.createElement("button");
             element.appendChild(document.createTextNode(username));
-
+            element.className = "user_button";
             element.onclick = function(){ // pass username, creator, and room name to user options
               userOptions(this.textContent, creator, roomName);
             }
@@ -156,7 +156,6 @@
         var message = data["message"];
 
         if (document.getElementById("room_title").textContent == roomName){
-            console.log("new message "+message+" in "+roomName);
             var element = document.createElement("p");
             element.appendChild(document.createTextNode(username + ":    "+message));
             element.appendChild(document.createElement('br'));
@@ -165,25 +164,41 @@
         }
       });
 
+      socketio.on("add_new_user", function(data){
+        var username = data["username"];
+        var roomName = data["roomName"];
+        if (document.getElementById("room_title").textContent == roomName){
+            var element = document.createElement("button");
+            element.appendChild(document.createTextNode(username));
+            element.className = "user_button";
+            element.onclick = function(){ // pass username, creator, and room name to user options
+              userOptions(this.textContent, creator, roomName);
+            }
+
+            document.getElementById("users_list").appendChild(element); 
+            document.getElementById("users_list").appendChild(document.createElement('br'));
+        }
+      });
+
+
       socketio.on("remove_user", function(data){  //remove username button
         var username = data["username"];
         var roomName = data["roomName"];
-        console.log("trying to remove user " + username);
-        var len = document.getElementById("users_list").childElementCount;
-        for (var i = 0; i<len; ++i){
-          //if (document.getElementById('users_list')[i].textContent == "username"){ //buggy
-            //do something
-        }
-     
-        document.getElementById("users_list").style.display = "none";
-        socketio.emit("users_in_room", {roomName:roomName});
-        document.getElementById("users_list").style.display = "block";
         
+        if (document.getElementById("room_title").textContent == roomName){
+          var usersList = document.getElementsByClassName("user_button");
+           
+          for (var i=0; i<usersList.length; i++){
+            if (usersList[i].textContent == username){ 
+              // console.log("removing "+usersList[i].textContent);
+              usersList[i].parentNode.removeChild(usersList[i]);
+            }
+          }
+        }
       });
 
       socketio.on("username_already_exists", function(data){
         var username = data["username"];
-        console.log("username already exists");
         alert("The username "+ username +" already exists. Please choose another.")
         document.getElementById("username").value = ""; // reset form
       });
@@ -198,7 +213,7 @@
       // LEAVE ROOM
       function leaveRoom(){ 
             var roomName = document.getElementById("room_title").textContent;
-            var username =  document.getElementById("username").textContent; 
+            var username =  document.getElementById("name").textContent; 
 
             document.getElementById("leave_room").style.visibility = "hidden";  // hide leave room button
             document.getElementById("rooms_header").style.visibility = "visible";// show rooms header and rooms list
@@ -207,7 +222,7 @@
             document.getElementById("middle").style.visibility = "hidden"; 
             document.getElementById("right").style.visibility = "hidden"; // hide middle and right column 
 
-            document.getElementById("users_list").innerHTML = ""; // remove all users from list ISSUE
+            //document.getElementById("users_list").innerHTML = ""; // remove all users from list ISSUE
 
             socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user //need to pass username
       }
