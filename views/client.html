@@ -78,6 +78,7 @@
 
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
+          //socketio.emit("check_for_ban", {roomName:roomName, username:username});
           socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
           socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
           socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
@@ -132,7 +133,7 @@
         if (me != creator){
           alert("you are not the creator of this room, so you can't ban users.");
         }
-        else {
+        else { // if you are creator, create pop up
           document.getElementById("ban_button").innerHTML = "ban " + username;
           document.getElementById("ban_button").onclick = function(){
             ban(username, roomName);
@@ -149,12 +150,21 @@
       // User is added to room's banned list
       function ban(username, roomName){
         console.log("banning "+username+" from "+roomName);
+       
+        socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user
+        
+        document.getElementById("popUpOptions").style.visibility = "hidden";
+        document.getElementById("theChatroom").style.display = "block";
+        
+        socketio.emit("check_for_kick", {roomName:roomName, username:username});
+        socketio.emit("ban", {roomName:roomName, username:username});
       }
       
       // User is removed from room right now, but can join again
       function kick(username, roomName){
         console.log("kicking "+username+" out of "+roomName);
-        socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user //need to pass username
+
+        socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user
      
         document.getElementById("popUpOptions").style.visibility = "hidden";
         document.getElementById("theChatroom").style.display = "block";
@@ -177,6 +187,10 @@
             document.getElementById("middle").style.visibility = "hidden"; 
             document.getElementById("right").style.visibility = "hidden"; // hide middle and right column 
         }
+      });
+
+      socketio.on("ban_on_click", function(data){
+        alert("you are banned from this room");
       });
 
       // Display all the messages in a room
