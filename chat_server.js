@@ -141,7 +141,21 @@ io.on('connection', function (socket) {
 			})
 			.on('error', console.error);
 	});
-
+	socket.on("is_there_password", function(data){
+		var roomName = data["roomName"];
+		var qry = ("SELECT password from rooms where name = $1");
+		con.query(qry, roomName)
+			.on('data', function(result){
+				password = result.password;
+				if (!(password == "NULL")){
+					//need a popup box for the pass
+				}
+				else{
+					//just let them enter the room already!!
+				}
+			})
+			.on('error', console.error);
+	})
 	// ADDS USER TO ROOM DB
 	socket.on("add_user_to_room", function(data){ //needs username
 		var roomName = data["roomName"];
@@ -164,6 +178,17 @@ io.on('connection', function (socket) {
 			.on('error', console.error); 
 		//console.log('removed '+username+' from room '+roomName);
 		io.sockets.emit("remove_user", {username:username, roomName:roomName});
+	});
+
+	//get password from server side
+	socket.on("get_password", function(data){
+		var password = data["password"];
+		var roomName = data["roomName"];
+		var sql = "UPDATE rooms SET password = $1 WHERE name = $2";
+		var values = [password, roomName];
+		con.query(sql, values)
+			.on('error', console.error);
+		console.log("updated "+ roomName +" to have password "+ password);
 	});
 
 });
