@@ -80,7 +80,14 @@
       window.onunload = function(event){
             var roomName = document.getElementById("room_title").textContent;
             var username = document.getElementById("name").textContent;
-            socketio.emit("remove_user_from_room", {roomName:roomName, username:username});
+            if (!((roomName == "") || (username == ""))){
+              socketio.emit("remove_user_from_room", {roomName:roomName, username:username});
+            }
+            else{
+              console.log("nothing to remove from sql")
+            }
+          
+            
       }
       // function pageClose(){
       //   console.log("reload")
