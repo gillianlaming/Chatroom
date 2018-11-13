@@ -57,6 +57,12 @@
             <input type="password" name="password" id="password" placeholder="password" required><br> 
             <input type="submit" name="submit" id ="submit_pass" value="Set Password"><br><br>
           </div>
+      <div id="enterPass">
+          <div id="checkPass"></div>
+          <input type="password" name="checkPassword" id="checkPassword" placeholder="password" required><br> 
+          <input type="submit" name="submit" id ="check_pass" value="enter"><br><br>
+          </div>
+      </div>
       </div>
    </body>
 
@@ -74,19 +80,7 @@
 
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
-          socketio.emit("is_there_password", {roomName:roomName});
-          socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
-          socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
-          socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
-
-          document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
-          document.getElementById("rooms_header").style.visibility="hidden"; // hide header
-          document.getElementById("rooms_list").style.visibility="hidden"; // hide room list 
-          document.getElementById("new_room_stuff").style.visibility = "hidden"; //can't add a new room when you're still in a room
-          
-          document.getElementById("middle").style.visibility = "visible"; // show chatroom
-          document.getElementById("right").style.visibility = "visible"; // show users list
-          document.getElementById("room_title").innerHTML = roomName; // show name
+          socketio.emit("is_there_password", {username:username, roomName:roomName});          
         }
         //   window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
         //     console.log("page was reloaded")
@@ -96,7 +90,42 @@
         //     });
         
       });
+      socketio.on("ask_for_password", function(data){
+        var username = data["username"];
+        var roomName = data["roomName"];
 
+         document.getElementById("theChatroom").style.display = 'none'; //hide the chatroom
+            document.getElementById("enterPass").style.display = 'block'; //dialog box
+            document.getElementById("checkPass").innerHTML = "enter the password";
+            //document.getElementById("password").textContent=" "; //prolly wrong
+            document.getElementById("check_pass").onclick = function(){ //when button user goes to submit pass
+              var password = document.getElementById("checkPassword").value; //get password from the html
+              console.log("entered password " + password);
+              
+              //socketio.emit("set_password", {password:password, roomName:roomName}); //send to server
+              document.getElementById("checkPassword").value =' ';
+              document.getElementById("enterPass").style.display = 'none'; 
+              document.getElementById("theChatroom").style.display = 'block'; //close the dialog box
+            }
+      });
+      //allows user to enter room if 1) there is no password or 2) they entered the correct password
+      socketio.on("enter_room", function(data){
+        var username = data["username"];
+        var roomName = data["roomName"];
+
+        socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
+        socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
+        socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
+
+          document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
+          document.getElementById("rooms_header").style.visibility="hidden"; // hide header
+          document.getElementById("rooms_list").style.visibility="hidden"; // hide room list 
+          document.getElementById("new_room_stuff").style.visibility = "hidden"; //can't add a new room when you're still in a room
+          
+          document.getElementById("middle").style.visibility = "visible"; // show chatroom
+          document.getElementById("right").style.visibility = "visible"; // show users list
+          document.getElementById("room_title").innerHTML = roomName; // show name
+      })
       // Display all the users in a room
       socketio.on("display_users", function(data){
           document.getElementById("users_list").innerHTML=""; // clears previous
@@ -256,7 +285,7 @@
           
             document.getElementById("submit_pass").onclick = function(){ //when button user goes to submit pass
               var password = document.getElementById("password").value; //get password from the html
-              socketio.emit("get_password", {password:password, roomName:roomName}); //send to server
+              socketio.emit("set_password", {password:password, roomName:roomName}); //send to server
               document.getElementById("password").value =' ';
               document.getElementById("popUpPass").style.display = 'none'; 
               document.getElementById("theChatroom").style.display = 'block'; //close the dialog box

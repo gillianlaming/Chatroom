@@ -74,13 +74,15 @@ io.on('connection', function (socket) {
 				}
 			});
 	});
-	
+	socket.on("check_password", function(data){
+		
+	});
 	// NEW ROOM CAN BE CREATED
 	socket.on("get_room_name", function(data){ 
 		roomName = data["roomName"]; 
 		username = data["username"];
-		var sql = "INSERT INTO rooms (name, user) VALUES ($1, $2)";
-		var values = [roomName, username];
+		var sql = "INSERT INTO rooms (name, user, password) VALUES ($1, $2, $3)";
+		var values = [roomName, username, "yeet"];
 		con.query(sql, values)
 			.on('error', console.error);
 		console.log(roomName+' inserted into db');
@@ -143,18 +145,24 @@ io.on('connection', function (socket) {
 	});
 	socket.on("is_there_password", function(data){
 		var roomName = data["roomName"];
+		var username = data["username"];
+		console.log("looking for password in "+roomName)
 		var qry = ("SELECT password from rooms where name = $1");
 		con.query(qry, roomName)
 			.on('data', function(result){
-				password = result.password;
-				if (!(password == "NULL")){
-					//need a popup box for the pass
+				pass = result.password;
+				console.log(pass);
+				if (pass == 'yeet'){
+					console.log("password is yeet");
+					socket.emit("enter_room", {username:username, roomName:roomName}); //just let them enter the room already!!
 				}
 				else{
-					//just let them enter the room already!!
+					socket.emit("ask_for_password", {username:username, roomName:roomName}); 
 				}
 			})
 			.on('error', console.error);
+		
+		
 	})
 	// ADDS USER TO ROOM DB
 	socket.on("add_user_to_room", function(data){ //needs username
@@ -181,7 +189,7 @@ io.on('connection', function (socket) {
 	});
 
 	//get password from server side
-	socket.on("get_password", function(data){
+	socket.on("set_password", function(data){
 		var password = data["password"];
 		var roomName = data["roomName"];
 		var sql = "UPDATE rooms SET password = $1 WHERE name = $2";
