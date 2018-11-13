@@ -7,8 +7,8 @@
       <link rel="stylesheet" href="../chat.css">
     </head>
 
-    <!-- <body> -->
-    <body onbeforeunload="return pageClose()">
+    <body>
+    <!-- <body onbeforeunload="return pageClose()"> -->
       <div id="getUsername">
           <h1>welcome to our chatroom!</h1>
           <h3>enter a nickname to enter</h3>
@@ -72,22 +72,21 @@
         <button id="ban_button"></button><br> 
         <button id="kick_button"></button><br><br>
       </div>
-
-      <body onbeforeunload="pageClose()"></body>
-
    </body>
 
    <script>
       var socketio = io.connect();
-      
-      function pageClose(){
-          alert("are u sure u want to leave the page?");
-          console.log("will it print");
-          return "hey";
-          
-          
-          
+
+      window.onunload = function(event){
+            var roomName = document.getElementById("room_title").textContent;
+            var username = document.getElementById("name").textContent;
+            socketio.emit("remove_user_from_room", {roomName:roomName, username:username});
       }
+      // function pageClose(){
+      //   console.log("reload")
+      //   alert("are u sure u want to leave the page?");
+          
+      // }
      
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(data){
@@ -306,6 +305,7 @@
           for (var i=0; i<usersList.length; i++){
             if (usersList[i].textContent == username){ 
               // console.log("removing "+usersList[i].textContent);
+              usersList[i].style.display="none";
               usersList[i].parentNode.removeChild(usersList[i]);
             }
           }
