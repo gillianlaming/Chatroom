@@ -1,21 +1,18 @@
 # README #
 
 ###ISSUES:
-- enter, leave, enter again, leave, enter again -- nothing displays
-- leaving a room does not remove the user from the list
-- somehow leaving a room adds the first user to the top of the list?
+- no incorrect password alert
 
 ###Todos:
 
 ######Gillian:
 - slide into dms
-- if room is private, we need a dialog box for password, and then pass that to sql
-- if a user wants to enter a room that is private, dialog box to submit password and then check that w the sql
-- chat creators 
 - if a room is private, can we make the button a different color?
 
 ######Leela:
 - remove users from database when they leave the site!!
+- banned users get an alert when they try to click on a room they are banned from
+- if banned from more than 2 rooms, get kicked off the site! (aka reload)
 
 ######later to dos:
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)

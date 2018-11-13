@@ -71,7 +71,7 @@ p{
     visibility: hidden
 }
 
-#leave_room{
+#leave_room, #popUpOptions{
     visibility: hidden;
 }
 
@@ -79,12 +79,11 @@ p{
     display: none;
 }
 
-#popUpOptions{
+#popUpOptions, #popUpPass, #enterPass{
     position: absolute;
     width: 60%;
     top: 150px;
     left: 20%;
     text-align: center;
-    visibility: hidden;
     border: 1px solid black;
 }

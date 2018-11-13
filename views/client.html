@@ -55,18 +55,19 @@
       </div>
 
       <div id="popUpPass">
-            <div id="thePassword"></div>
+            <h3 id="thePassword"></h3>
             <input type="password" name="password" id="password" placeholder="password" required><br> 
             <input type="submit" name="submit" id ="submit_pass" value="Set Password"><br><br>
       </div>
 
       <div id="enterPass">
-          <div id="checkPass"></div>
+          <h3 id="checkPass"></h3>
           <input type="password" name="checkPassword" id="checkPassword" placeholder="password" required><br> 
           <input type="submit" name="submit" id ="check_pass" value="enter"><br><br>
       </div>
 
       <div id="popUpOptions">
+        <br>
         <button id="ban_button"></button><br> 
         <button id="kick_button"></button><br><br>
       </div>
@@ -88,7 +89,7 @@
 
         // FUNCTION FOR ENTERING A ROOM 
         btn.onclick = function(){ 
-          socketio.emit("is_there_password", {username:username, roomName:roomName});          
+          socketio.emit("is_there_password", {username:username, roomName:roomName, creator:creator});          
           //socketio.emit("check_for_ban", {roomName:roomName, username:username});
         }
         //   window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
@@ -102,17 +103,17 @@
       socketio.on("ask_for_password", function(data){
         var username = data["username"];
         var roomName = data["roomName"];
+        var creator = data["creator"];
 
          document.getElementById("theChatroom").style.display = 'none'; //hide the chatroom
             document.getElementById("enterPass").style.display = 'block'; //dialog box
-            document.getElementById("checkPass").innerHTML = "enter the password";
-            //document.getElementById("password").textContent=" "; //prolly wrong
+            document.getElementById("checkPass").innerHTML = "enter the password for "+roomName;
             document.getElementById("check_pass").onclick = function(){ //when button user goes to submit pass
               var password = document.getElementById("checkPassword").value; //get password from the html
               console.log("entered password " + password);
-              socketio.emit("check_password", {roomName:roomName, username:username, password:password});
+              socketio.emit("check_password", {roomName:roomName, username:username, password:password, creator:creator});
               //socketio.emit("set_password", {password:password, roomName:roomName}); //send to server
-              document.getElementById("checkPassword").value =' ';
+              document.getElementById("checkPassword").value ='';
               document.getElementById("enterPass").style.display = 'none'; 
               document.getElementById("theChatroom").style.display = 'block'; //close the dialog box
             }
@@ -121,6 +122,7 @@
       socketio.on("enter_room", function(data){
         var username = data["username"];
         var roomName = data["roomName"];
+        var creator = data["creator"];
 
         socketio.emit("add_user_to_room", {roomName:roomName, username:username}); //add current user to room in sql
         socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
@@ -134,6 +136,7 @@
           document.getElementById("middle").style.visibility = "visible"; // show chatroom
           document.getElementById("right").style.visibility = "visible"; // show users list
           document.getElementById("room_title").innerHTML = roomName; // show name
+          document.getElementById("room_creator").innerHTML = creator;
       })
       // Display all the users in a room
       socketio.on("display_users", function(data){
@@ -220,10 +223,6 @@
             document.getElementById("middle").style.visibility = "hidden"; 
             document.getElementById("right").style.visibility = "hidden"; // hide middle and right column 
         }
-      });
-
-      socketio.on("ban_on_click", function(data){
-        alert("you are banned from this room");
       });
 
       // Display all the messages in a room
@@ -345,8 +344,8 @@
           if(isChecked){
             document.getElementById("theChatroom").style.display = 'none'; //hide the chatroom
             document.getElementById("popUpPass").style.display = 'block'; //dialog box
-            document.getElementById("thePassword").innerHTML = "set password u fuk";
-            //document.getElementById("password").textContent=" "; //prolly wrong
+            document.getElementById("thePassword").innerHTML = "set a password for "+roomName;
+            document.getElementById("private").checked = false;
           
             document.getElementById("submit_pass").onclick = function(){ //when button user goes to submit pass
               var password = document.getElementById("password").value; //get password from the html

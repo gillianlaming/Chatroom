@@ -74,21 +74,22 @@ io.on('connection', function (socket) {
 			});
 	});
 	socket.on("check_password", function(data){
-		roomName = data["roomName"]; 
-		username = data["username"];
-		password = data["password"];
+		var roomName = data["roomName"]; 
+		var username = data["username"];
+		var password = data["password"];
+		var creator = data["creator"];
 
 		var qry = ("SELECT password from rooms where name = $1");
 		con.query(qry, roomName)
 			.on('data', function(result){
 				pass = result.password;
-				console.log(pass);
+
 				if (pass == password){
 					console.log("password is correct!!!");
-					socket.emit("enter_room", {username:username, roomName:roomName}); //just let them enter the room already!!
+					socket.emit("enter_room", {username:username, roomName:roomName, creator:creator}); //just let them enter the room already!!
 				}
 				else{
-					console.log("you fucked up");
+					console.log("incorrect password");
 					//socket.emit("ask_for_password", {username:username, roomName:roomName}); 
 				}
 			})
@@ -157,18 +158,18 @@ io.on('connection', function (socket) {
 	socket.on("is_there_password", function(data){
 		var roomName = data["roomName"];
 		var username = data["username"];
+		var creator = data["creator"];
 		console.log("looking for password in "+roomName)
 		var qry = ("SELECT password from rooms where name = $1");
 		con.query(qry, roomName)
 			.on('data', function(result){
 				pass = result.password;
-				console.log(pass);
+
 				if (pass == 'yeet'){
-					console.log("password is yeet");
-					socket.emit("enter_room", {username:username, roomName:roomName}); //just let them enter the room already!!
+					socket.emit("enter_room", {username:username, roomName:roomName, creator:creator}); //just let them enter the room already!!
 				}
 				else{
-					socket.emit("ask_for_password", {username:username, roomName:roomName}); 
+					socket.emit("ask_for_password", {username:username, roomName:roomName, creator:creator}); 
 				}
 			})
 			.on('error', console.error);
