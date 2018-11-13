@@ -8,7 +8,6 @@
 ###Todos:
 
 ######Gillian:
-- if a user closes tab w/o leaving room, idk how to deal w that w/r/t database
 - slide into dms
 - if room is private, we need a dialog box for password, and then pass that to sql
 - if a user wants to enter a room that is private, dialog box to submit password and then check that w the sql
@@ -22,7 +21,6 @@
 - rooms can be password protected (have a pop up window when you enter a room, but css must be working at this point)
 - room creators can ban people from rooms
 - also temporarily block
-- make it so that you don't have to delete text from message box after you send a message
 - rooms can be private
 
 ######Steps:
