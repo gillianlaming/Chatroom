@@ -13,6 +13,7 @@
 - if room is private, we need a dialog box for password, and then pass that to sql
 - if a user wants to enter a room that is private, dialog box to submit password and then check that w the sql
 - chat creators 
+- if a room is private, can we make the button a different color?
 
 ######Leela:
 - remove users from database when they leave the site!!
