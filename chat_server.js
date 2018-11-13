@@ -75,7 +75,25 @@ io.on('connection', function (socket) {
 			});
 	});
 	socket.on("check_password", function(data){
-		
+		roomName = data["roomName"]; 
+		username = data["username"];
+		password = data["password"];
+
+		var qry = ("SELECT password from rooms where name = $1");
+		con.query(qry, roomName)
+			.on('data', function(result){
+				pass = result.password;
+				console.log(pass);
+				if (pass == password){
+					console.log("password is correct!!!");
+					socket.emit("enter_room", {username:username, roomName:roomName}); //just let them enter the room already!!
+				}
+				else{
+					console.log("you fucked up");
+					//socket.emit("ask_for_password", {username:username, roomName:roomName}); 
+				}
+			})
+			.on('error', console.error);
 	});
 	// NEW ROOM CAN BE CREATED
 	socket.on("get_room_name", function(data){ 

@@ -101,7 +101,7 @@
             document.getElementById("check_pass").onclick = function(){ //when button user goes to submit pass
               var password = document.getElementById("checkPassword").value; //get password from the html
               console.log("entered password " + password);
-              
+              socketio.emit("check_password", {roomName:roomName, username:username, password:password});
               //socketio.emit("set_password", {password:password, roomName:roomName}); //send to server
               document.getElementById("checkPassword").value =' ';
               document.getElementById("enterPass").style.display = 'none'; 
