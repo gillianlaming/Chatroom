@@ -46,12 +46,22 @@
             <button onclick="sendMessage()">send message</button>
           </div>
         </div>
+       
         <div class="column right_column" id="right">
           <h3>users in this room:</h3>
           <p>(click to kick out or ban)</p>
             <ul class="list" id="users_list">
                  <!-- should add username once user joins room. also must broadcast change -->
             </ul>
+        </div>
+      </div>
+
+      <div id="direct_messaging">
+          <h1>direct message with <i id="dmRecip"></i></h1> <!--name of user direct messeging with-->
+          <div id="message_log"></div> <!--where messages from private message go-->
+        <div id="direct_messenger">
+            <input type="text" id="priv_message_input"/>
+            <button onclick="slide()">send message</button>
         </div>
       </div>
 
@@ -71,30 +81,25 @@
         <br>
         <button id="ban_button"></button><br> 
         <button id="kick_button"></button><br><br>
+        <button id="private_message"></button>
+        <button id="close" onclick="close()">close</button>
       </div>
    </body>
 
    <script>
       var socketio = io.connect();
-
+      //handles case when user closes page without clicking "leave room"
       window.onunload = function(event){
             var roomName = document.getElementById("room_title").textContent;
             var username = document.getElementById("name").textContent;
-            if (!((roomName == "") || (username == ""))){
+            if (!((roomName == "") || (username == ""))){ //if username is set and the user is in a room
               socketio.emit("remove_user_from_room", {roomName:roomName, username:username});
             }
             else{
               console.log("nothing to remove from sql")
-            }
-          
-            
+            }    
       }
-      // function pageClose(){
-      //   console.log("reload")
-      //   alert("are u sure u want to leave the page?");
-          
-      // }
-     
+  
       // DISPLAYS ROOM NAMES AS BUTTONS
       socketio.on("room_names", function(data){
         var roomName = data["roomName"]; var creator = data["creator"];
@@ -180,12 +185,34 @@
           }
       });
 
+      socketio.on("new_msg", function(data){
+        message = data["message"];
+        username = data["username"];
+        
+        document.getElementById("message_log").innerHTML = ""; //clear old chats
+        var msgList = document.createElement("div");
+          var element = document.createElement("p");
+          element.appendChild(document.createTextNode(username + ":    "+message));
+          element.appendChild(document.createElement('br'));
+          msgList.appendChild(element);
+
+          document.getElementById("chatlog").appendChild(msgList);
+          scrollDown();
+
+      });
+
       //banning a user and kicking a user out
       function userOptions(username, creator, roomName){
         // if logged in as creator, you are able to kick out / ban this user
         var me = document.getElementById("name").textContent;
         if (me != creator){
-          alert("you are not the creator of this room, so you can't ban users.");
+          //alert("you are not the creator of this room, so you can't ban users.");
+          document.getElementById("private_message").innerHTML = "direct message "+ username; //gonna get this working first, then will move so not only room creator can send
+          document.getElementById("private_message").onclick =function(){
+            dm(username, me);//start private message w user
+          }
+          document.getElementById("popUpOptions").style.visibility = "visible";
+          document.getElementById("theChatroom").style.display = "none";
         }
         else { // if you are creator, create pop up
           document.getElementById("ban_button").innerHTML = "ban " + username;
@@ -196,11 +223,40 @@
           document.getElementById("kick_button").onclick = function(){
             kick(username, roomName);
           }
+          document.getElementById("private_message").innerHTML = "direct message "+ username; //gonna get this working first, then will move so not only room creator can send
+          document.getElementById("private_message").onclick =function(){
+            dm(username, me);//start private message w user
+          }
           document.getElementById("popUpOptions").style.visibility = "visible";
           document.getElementById("theChatroom").style.display = "none";
         }
       }
-      
+      //close out of popup
+      function close(){
+        console.log("trying to close the window");
+        document.getElementById("popUpOptions").style.visibility = "hidden";
+        document.getElementById("theChatroom").style.display = "block";
+      }
+      //start a direct message with a particular user
+      function dm(username, me){
+        console.log(me + " is trying to slide into " + username + "'s dm");
+
+        document.getElementById("popUpOptions").style.visibility = "hidden"; //close popup
+        document.getElementById("direct_messaging").style.display = "block"; //show message boxes
+        document.getElementById("rooms_header").style.visibility="hidden"; // hide header
+        document.getElementById("rooms_list").style.visibility="hidden"; // hide room list 
+        document.getElementById("new_room_stuff").style.visibility = "hidden"; //can't add a new room when you're still in a room
+        document.getElementById("dmRecip").innerHTML = username; // show name
+        
+        
+      }
+
+      //slide into that dm tho
+      function slide(){
+        var username = document.getElementById("dmRecip").innerHTML;
+        var message = document.getElementById("priv_message_input").value; //capture message
+        socketio.emit('private_message', {username:username, message:message});
+      }
       // User is added to room's banned list
       function ban(username, roomName){
         console.log("banning "+username+" from "+roomName);

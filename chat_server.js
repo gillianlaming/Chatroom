@@ -56,6 +56,7 @@ io.on('connection', function (socket) {
 			.on('end', function(){
 				if(exists == false){
 					console.log("the username does not exist");
+					socket.join(username); //join the socket thru unique username (?)
 					var insert = "INSERT INTO users (user) values ($1)";
 					con.query(insert, username)
 						.on('error', console.error);
@@ -238,6 +239,16 @@ io.on('connection', function (socket) {
 		
 		io.sockets.emit("kick", {username:username, roomName:roomName});
 	});
+
+	//private message a user
+	socket.on("private_message", function(data){
+		chatRecipient = data['username'];
+		message = data["message"];
+		console.log(chatRecipient + " should be receiving message "+ message);
+		//capture the message from client side
+		io.sockets.in(chatRecipient).emit('new_msg', {username:chatRecipient, message:message});
+	})
+	
 
 	// Adds bans on users to db
 	socket.on("ban", function(data){

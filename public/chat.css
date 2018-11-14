@@ -44,6 +44,10 @@ p{
     position: relative;
     top: 15px;
 }
+#private_messenger{
+    position: relative;
+    top: 15px;
+}
 #getUsername{
     position: absolute;
     width: 60%;
@@ -53,6 +57,13 @@ p{
 }
 
 #chatlog{
+    border-left: 2px solid lightskyblue;
+    padding-left: 7px;
+    max-height: 450px;
+    overflow-y: scroll;
+}
+
+#message_log{
     border-left: 2px solid lightskyblue;
     padding-left: 7px;
     max-height: 450px;
@@ -78,6 +89,12 @@ p{
 #popUpPass, #enterPass{
     display: none;
 }
+
+#direct_messaging{
+    display: none;
+}
+
+
 
 #popUpOptions, #popUpPass, #enterPass{
     position: absolute;

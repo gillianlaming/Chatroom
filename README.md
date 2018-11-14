@@ -6,10 +6,11 @@
 
 ###Todos:
 - cancel button for password
+- back button after u click a users name
+- we dont need to store privat messages in sql right???
 
 ######Gillian:
-- slide into dms
-- if a room is private, can we make the button a different color?
+- direct messaging: where does button go
 
 ######Leela:
 - remove users from database when they leave the site!!
