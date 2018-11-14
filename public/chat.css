@@ -82,19 +82,17 @@ p{
     visibility: hidden
 }
 
-#leave_room, #popUpOptions{
+#leave_room, #popUpOptions, #delete_room{
     visibility: hidden;
 }
 
-#popUpPass, #enterPass{
+#popUpPass, #enterPass, #direct_messaging{
     display: none;
 }
 
-#direct_messaging{
-    display: none;
+#new_room_stuff{
+    font-size: 14px; 
 }
-
-
 
 #popUpOptions, #popUpPass, #enterPass{
     position: absolute;

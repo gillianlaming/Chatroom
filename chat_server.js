@@ -128,7 +128,8 @@ io.on('connection', function (socket) {
 			}
 		}
 		
-		if (!isBad){
+		if (isBad == "false"){
+		console.log("did it make it here?");
 		var sql = "INSERT INTO messages (content, user, room_name) VALUES ($1, $2, $3)";
 		var values = [mess, username, roomName]; 
 		con.query(sql, values)
