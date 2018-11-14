@@ -246,6 +246,7 @@ io.on('connection', function (socket) {
 		message = data["message"];
 		console.log(chatRecipient + " should be receiving message "+ message);
 		//capture the message from client side
+		//socket.emit("new_msg", {username:chatRecipient, message:message});
 		io.sockets.in(chatRecipient).emit('new_msg', {username:chatRecipient, message:message});
 	})
 	
