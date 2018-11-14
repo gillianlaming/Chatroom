@@ -5,6 +5,8 @@
 2. Gillian Laming 457507
 
 #####How to use our chatroom:
+######Please run `npm install` and `node chat_server.js` then open `localhost:3456`
+
 1. First, create a username to enter the chatroom. 
     - Usernames must be unique, so if a user enters a username that already exists, there will be an alert for them to enter a different username.
 2. Upon entry to the site, users will be presented with a list of existing rooms, and the option to create a new room. 
