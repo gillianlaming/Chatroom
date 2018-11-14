@@ -117,7 +117,7 @@ io.on('connection', function (socket) {
 		//parse message
 		var isBad = "false";
 		var content = mess.split(" ");
-		var badWord = ["shit", "fuck", "damn", "ass", "whore", "dick", "bitch", "asshole", "bitches", "motherfucker"];
+		var badWord = ["shit", "fuck", "damn", "ass", "whore", "dick", "bitch", "asshole", "bitches", "motherfucker", "fuckers"];
 		for (var i=0; i<content.length; i++){
 			for (var j = 0; j<badWord.length; j++){
 				if (content[i] == badWord[j]){
