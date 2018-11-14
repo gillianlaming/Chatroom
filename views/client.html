@@ -20,6 +20,7 @@
         <div class="column left_column" id="left">
             <p>your nickname is: <i id="name"></i></p>
             <button id="leave_room" onclick="leaveRoom()">leave this room</button>
+            <button id="delete_room">delete this room</button>
           <div id="rooms_header">
             <h3>rooms:</h3>
             <p>(click to visit)</p>
@@ -58,7 +59,6 @@
 
       <div id="direct_messaging">
           <h1>direct message with <i id="dmRecip"></i></h1> <!--name of user direct messeging with-->
-          <div id="message_log"></div> <!--where messages from private message go-->
         <div id="direct_messenger">
             <input type="text" id="priv_message_input"/>
             <button onclick="slide()">send message</button>
@@ -152,6 +152,7 @@
         socketio.emit("messages_in_room", {roomName:roomName}); //display all the old messages when the user enters
 
           document.getElementById('leave_room').style.visibility = "visible"; // display leave room btn
+          document.getElementById("delete_room").style.visibility = "visible";
           document.getElementById("rooms_header").style.visibility="hidden"; // hide header
           document.getElementById("rooms_list").style.visibility="hidden"; // hide room list 
           document.getElementById("new_room_stuff").style.visibility = "hidden"; //can't add a new room when you're still in a room
@@ -160,7 +161,10 @@
           document.getElementById("right").style.visibility = "visible"; // show users list
           document.getElementById("room_title").innerHTML = roomName; // show name
           document.getElementById("room_creator").innerHTML = creator;
+
+          socketio.emit("check_delete_room", {username:username, roomName:roomName});
       })
+      
       // Display all the users in a room
       socketio.on("display_users", function(data){
           document.getElementById("users_list").innerHTML=""; // clears previous
@@ -183,6 +187,7 @@
           if (document.getElementById("room_title").textContent == roomName){
             document.getElementById("users_list").appendChild(bigList);
           }
+
       });
 
       socketio.on("new_msg", function(data){
@@ -204,27 +209,27 @@
           document.getElementById("private_message").onclick =function(){
             dm(username, me);//start private message w user
           }
-          
+          document.getElementById("ban_button").innerHTML = "ban " + username;
+          document.getElementById("ban_button").onclick = function(){
+            alert ("You are not the creator of this room, so you can't do that");
+          }
+          document.getElementById("kick_button").onclick = function(){
+            alert ("You are not the creator of this room, so you can't do that");
+          }
+          document.getElementById("kick_button").innerHTML = "kick out " + username;
           document.getElementById("close").onclick = function(){
             document.getElementById("popUpOptions").style.visibility = "hidden";
             document.getElementById("theChatroom").style.display = "block";
           }
-          
           document.getElementById("popUpOptions").style.visibility = "visible";
           document.getElementById("theChatroom").style.display = "none";
         }
-        else { // if you are creator, create pop up
-          document.getElementById("ban_button").innerHTML = "ban " + username;
+        else { //you are creator of the room
           document.getElementById("ban_button").onclick = function(){
             ban(username, roomName);
           }
-          document.getElementById("kick_button").innerHTML = "kick out " + username;
           document.getElementById("kick_button").onclick = function(){
             kick(username, roomName);
-          }
-          document.getElementById("private_message").innerHTML = "direct message "+ username; //gonna get this working first, then will move so not only room creator can send
-          document.getElementById("private_message").onclick =function(){
-            dm(username, me);//start private message w user
           }
           document.getElementById("popUpOptions").style.visibility = "visible";
           document.getElementById("theChatroom").style.display = "none";
@@ -261,6 +266,7 @@
         var sender = document.getElementById("name").textContent;
         socketio.emit('private_message', {username:recip, message:message, sender:sender});
         alert("Your message has been sent");
+        document.getElementById("priv_message_input").value = ""; //clear textbox
         document.getElementById("direct_messaging").style.display = "none"; //hide message boxes
         document.getElementById("rooms_header").style.visibility="visible"; // show header
         document.getElementById("dmRecip").innerHTML = username; // show name
@@ -280,7 +286,16 @@
         socketio.emit("check_for_kick", {roomName:roomName, username:username});
         socketio.emit("ban", {roomName:roomName, username:username});
       }
-      
+
+      socketio.on("bad_word", function(data){ //consequences of saying a bad word
+        console.log("bad words are bad")
+        username = data["username"];
+        roomName = data["roomName"];
+        alert("Your message contained explicit language. This chatroom serves as a safe space for all members, and therefore we are no longer inviting you to be a part of this community. You are being kicked out. Henceforth, please consider your language more carefully.")
+        socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user
+        socketio.emit("check_for_kick", {roomName:roomName, username:username});
+      });
+
       // User is removed from room right now, but can join again
       function kick(username, roomName){
         console.log("kicking "+username+" out of "+roomName);

@@ -6,8 +6,6 @@
 
 ###Todos:
 - cancel button for password
-- back button after u click a users name
-- we dont need to store privat messages in sql right???
 
 ######Gillian:
 - direct messaging: where does button go

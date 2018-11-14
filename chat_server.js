@@ -114,13 +114,28 @@ io.on('connection', function (socket) {
 		var mess = data["message"];
 		var roomName = data["roomName"];
 		var username = data["username"];
-
+		//parse message
+		var isBad = "false";
+		var content = mess.split(" ");
+		var badWord = ["shit", "fuck", "damn", "ass", "whore", "dick", "bitch", "asshole"];
+		for (var i=0; i<content.length; i++){
+			for (var j = 0; j<badWord.length; j++){
+				if (content[i] == badWord[j]){
+					console.log("you said a bad word");
+					isBad = "true";
+					socket.emit("bad_word",{username:username, roomName:roomName});
+				}
+			}
+		}
+		
+		if (!isBad){
 		var sql = "INSERT INTO messages (content, user, room_name) VALUES ($1, $2, $3)";
 		var values = [mess, username, roomName]; 
 		con.query(sql, values)
 			.on('error', console.error);  
 
 		io.sockets.emit('new_message', {message:mess, roomName:roomName, username:username}); // new messages must be broadcasted to all users
+		}
 	});
 	
 	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
