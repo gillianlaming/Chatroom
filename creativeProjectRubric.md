@@ -1,3 +1,6 @@
+####Approved by Jordie Chisam 11/14
+
+
 ###Washu Missed Connections
 
 Our idea for the creative project is to create a site where WashU students can anonmously post messages about people they saw around campus who they wish they had talked to. The main page will show all the posts and anyone can go on and read them. If you create an account, you can post or reply to a post to say that it was you or you think you know the person they are talking about. The goal of the site is to allow shy people to have a chance to talk to someone they think they might have a connection with, or to allow students to find someone they always see around.
