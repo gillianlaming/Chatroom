@@ -62,7 +62,6 @@
         <div id="direct_messenger">
             <input type="text" id="priv_message_input"/>
             <button onclick="slide()">send message</button>
-            <button id="back_to_room">back to room</button>
         </div>
       </div>
 
@@ -190,16 +189,9 @@
         message = data["message"];
         username = data["username"];
         
-        document.getElementById("message_log").innerHTML = ""; //clear old chats
-        var msgList = document.createElement("div");
-          var element = document.createElement("p");
-          element.appendChild(document.createTextNode(username + ":    "+message));
-          element.appendChild(document.createElement('br'));
-          msgList.appendChild(element);
-
-          document.getElementById("chatlog").appendChild(msgList);
-          scrollDown();
-      
+        alert(username + " is sending you a private message!");
+        alert(username + " says " + message);
+        
       });
 
       //banning a user and kicking a user out
@@ -212,6 +204,12 @@
           document.getElementById("private_message").onclick =function(){
             dm(username, me);//start private message w user
           }
+          
+          document.getElementById("close").onclick = function(){
+            document.getElementById("popUpOptions").style.visibility = "hidden";
+            document.getElementById("theChatroom").style.display = "block";
+          }
+          
           document.getElementById("popUpOptions").style.visibility = "visible";
           document.getElementById("theChatroom").style.display = "none";
         }
@@ -234,8 +232,11 @@
       }
       //close out of popup
       function close(){
-        console.log("trying to close the window");
-        document.getElementById("popUpOptions").style.visibility = "hidden";
+        console.log("close the window goddammit")
+        document.getElementById("direct_messaging").style.display = "none"; //hide message boxes
+        document.getElementById("rooms_header").style.visibility="visible"; // show header
+        
+        
         document.getElementById("theChatroom").style.display = "block";
       }
       //start a direct message with a particular user
@@ -248,18 +249,22 @@
         document.getElementById("rooms_list").style.visibility="hidden"; // hide room list 
         document.getElementById("new_room_stuff").style.visibility = "hidden"; //can't add a new room when you're still in a room
         document.getElementById("dmRecip").innerHTML = username; // show name
-        document.getElementById("back_to_room").onclick = function(){
-          //take back to room
-        }
+        
         
         
       }
 
       //slide into that dm tho
       function slide(){
-        var username = document.getElementById("dmRecip").innerHTML;
+        var recip = document.getElementById("dmRecip").innerHTML;
         var message = document.getElementById("priv_message_input").value; //capture message
-        socketio.emit('private_message', {username:username, message:message});
+        var sender = document.getElementById("name").textContent;
+        socketio.emit('private_message', {username:recip, message:message, sender:sender});
+        alert("Your message has been sent");
+        document.getElementById("direct_messaging").style.display = "none"; //hide message boxes
+        document.getElementById("rooms_header").style.visibility="visible"; // show header
+        document.getElementById("dmRecip").innerHTML = username; // show name
+        document.getElementById("theChatroom").style.display = "block";
       }
       // User is added to room's banned list
       function ban(username, roomName){
