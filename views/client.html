@@ -311,6 +311,17 @@
         socketio.emit("ban", {roomName:roomName, username:username});
       }
 
+      socketio.on("you_are_banned", function(data){
+          var roomName = data["roomName"];
+          var username = data['username'];
+          console.log("all clients know that "+username+" has been banned from "+roomName);
+          var me = document.getElementById("name").textContent;
+          
+          if (me == username){
+              alert("you are banned from "+roomName);
+          }
+      }); 
+
       socketio.on("bad_word", function(data){ //consequences of saying a bad word
         console.log("bad words are bad")
         username = data["username"];
@@ -404,7 +415,6 @@
             document.getElementById("users_list").appendChild(document.createElement('br'));
         }
       });
-
 
       socketio.on("remove_user", function(data){  //remove username button
         var username = data["username"];

@@ -206,17 +206,24 @@ io.on('connection', function (socket) {
 				if (pass == 'yeet'){ // no password
 					console.log("checking to see if "+username+" has been banned from "+roomName);
 					// see if user is banned from this room
+					var banned = false;
 					var q = "SELECT * from banned where username = $1";
 					con.query(q, username)
 						.on('data', function(result){
+							console.log(username);
 							if (result.room1 == roomName || result.room2 == roomName){
-								console.log(username+" is banned from this room!");
-								//io.sockets.emit("you_are_banned", {username:username, roomName:roomName});
+								banned = true;
 							}
 						})
 						.on('end', function(){
-							console.log(username+" is not banned from "+roomName);
-							socket.emit("enter_room", {username:username, roomName:roomName, creator:creator}); //just let them enter the room already!!
+							if (banned){
+								console.log(username+" is banned from this room!");
+								io.sockets.emit("you_are_banned", {username:username, roomName:roomName});
+							}
+							else {
+								console.log(username+" is not banned from "+roomName);
+								socket.emit("enter_room", {username:username, roomName:roomName, creator:creator}); //just let them enter the room already!!
+							}
 						})
 						.on('error', console.error);
 					}
@@ -225,7 +232,8 @@ io.on('connection', function (socket) {
 				}
 			})
 			.on('error', console.error);
-	})
+	});
+
 	// ADDS USER TO ROOM DB
 	socket.on("add_user_to_room", function(data){ //needs username
 		var roomName = data["roomName"];
@@ -263,13 +271,14 @@ io.on('connection', function (socket) {
 			.on('error', console.error);
 		console.log("updated "+ roomName +" to have password "+ hash);
 	});
+
 	// check if user has been kicked out
 	socket.on("check_for_kick", function(data){
-		console.log("kick????");
-		
 		var roomName = data["roomName"];
 		var username = data["username"];
-		
+
+		console.log("server knows that "+username+" has been kicked out of "+roomName);
+
 		io.sockets.emit("kick", {username:username, roomName:roomName});
 	});
 
