@@ -117,7 +117,7 @@ io.on('connection', function (socket) {
 		//parse message
 		var isBad = "false";
 		var content = mess.split(" ");
-		var badWord = ["shit", "fuck", "damn", "ass", "whore", "dick", "bitch", "asshole"];
+		var badWord = ["shit", "fuck", "damn", "ass", "whore", "dick", "bitch", "asshole", "bitches", "motherfucker"];
 		for (var i=0; i<content.length; i++){
 			for (var j = 0; j<badWord.length; j++){
 				if (content[i] == badWord[j]){
@@ -128,7 +128,8 @@ io.on('connection', function (socket) {
 			}
 		}
 		
-		if (!isBad){
+		if (isBad == "false"){
+		console.log("did it make it here?");
 		var sql = "INSERT INTO messages (content, user, room_name) VALUES ($1, $2, $3)";
 		var values = [mess, username, roomName]; 
 		con.query(sql, values)

@@ -33,7 +33,7 @@
           <div id="new_room_stuff">
             <hr width="50%" style="margin-left: 0">
             <input type="text" id="room_name"/>
-            <button onclick="addRoom()" id="add_room">add a room</button><br>
+            <button onclick="addRoom()" id="add_room">add room</button><br>
             <input type="checkbox" id="private">private room
           </div>
         </div>
@@ -50,7 +50,7 @@
        
         <div class="column right_column" id="right">
           <h3>users in this room:</h3>
-          <p>(click to kick out or ban)</p>
+          <p>(click to kick out, ban, or private message)</p>
             <ul class="list" id="users_list">
                  <!-- should add username once user joins room. also must broadcast change -->
             </ul>
@@ -79,10 +79,11 @@
 
       <div id="popUpOptions">
         <br>
-        <button id="ban_button"></button><br> 
-        <button id="kick_button"></button><br><br>
-        <button id="private_message"></button>
-        <button id="close" onclick="close()">close</button>
+        <h4 id="user_options_header"></h4>
+        <button id="ban_button">ban</button><br> 
+        <button id="kick_button">kick out</button><br>
+        <button id="private_message">private message</button><br><br>
+        <button id="close" onclick="close()">close</button><br>
       </div>
    </body>
 
@@ -227,34 +228,37 @@
       function userOptions(username, creator, roomName){
         // if logged in as creator, you are able to kick out / ban this user
         var me = document.getElementById("name").textContent;
-        if (me != creator){
-          //alert("you are not the creator of this room, so you can't ban users.");
-          document.getElementById("private_message").innerHTML = "direct message "+ username; //gonna get this working first, then will move so not only room creator can send
-          document.getElementById("private_message").onclick =function(){
-            dm(username, me);//start private message w user
+
+        if (me == username){
+          alert("you clicked on yourself, you can't ban, kick out, or message yourself!");
+        } 
+        else {
+          if (me != creator){
+            document.getElementById("private_message").onclick =function(){
+              dm(username, me);//start private message w user
+            }
+
+            document.getElementById("ban_button").onclick = function(){
+              alert ("You are not the creator of this room, so you can't do that");
+            }
+            document.getElementById("kick_button").onclick = function(){
+              alert ("You are not the creator of this room, so you can't do that");
+            }
+
+            document.getElementById("close").onclick = function(){
+              document.getElementById("popUpOptions").style.visibility = "hidden";
+              document.getElementById("theChatroom").style.display = "block";
+            }
           }
-          document.getElementById("ban_button").innerHTML = "ban " + username;
-          document.getElementById("ban_button").onclick = function(){
-            alert ("You are not the creator of this room, so you can't do that");
+          else { //you are creator of the room
+            document.getElementById("ban_button").onclick = function(){
+              ban(username, roomName);
+            }
+            document.getElementById("kick_button").onclick = function(){
+              kick(username, roomName);
+            }
           }
-          document.getElementById("kick_button").onclick = function(){
-            alert ("You are not the creator of this room, so you can't do that");
-          }
-          document.getElementById("kick_button").innerHTML = "kick out " + username;
-          document.getElementById("close").onclick = function(){
-            document.getElementById("popUpOptions").style.visibility = "hidden";
-            document.getElementById("theChatroom").style.display = "block";
-          }
-          document.getElementById("popUpOptions").style.visibility = "visible";
-          document.getElementById("theChatroom").style.display = "none";
-        }
-        else { //you are creator of the room
-          document.getElementById("ban_button").onclick = function(){
-            ban(username, roomName);
-          }
-          document.getElementById("kick_button").onclick = function(){
-            kick(username, roomName);
-          }
+          document.getElementById("user_options_header").innerHTML = "options for "+username;
           document.getElementById("popUpOptions").style.visibility = "visible";
           document.getElementById("theChatroom").style.display = "none";
         }
@@ -352,6 +356,7 @@
         if (document.getElementById("name").textContent == username && document.getElementById("room_title").textContent == roomName){
             alert("you have been kicked out of "+roomName);
             document.getElementById("leave_room").style.visibility = "hidden";  // hide leave room button
+            document.getElementById("delete_room").style.visibility = "hidden";  // hide leave room button
             document.getElementById("rooms_header").style.visibility = "visible";// show rooms header and rooms list
             document.getElementById("rooms_list").style.visibility = "visible";
             document.getElementById("new_room_stuff").style.visibility = "visible"; // show add room button
