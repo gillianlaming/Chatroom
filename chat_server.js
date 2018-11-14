@@ -137,7 +137,25 @@ io.on('connection', function (socket) {
 		io.sockets.emit('new_message', {message:mess, roomName:roomName, username:username}); // new messages must be broadcasted to all users
 		}
 	});
-	
+	//delete a room
+	socket.on("delete_room", function(data){
+		roomName = data["roomName"];
+		mess = 'The room you are currently in has been deleted.'
+		var qry = ("SELECT user from users where room = $1");
+		con.query(qry, roomName)
+			.on('data', function(result){
+				user = result.user; //capture each user in the room
+				io.sockets.in(user).emit('delete_msg', {message:mess, roomName:roomName});
+			})
+			.on('error', console.error); 	
+		//now actually delete the room
+		var sql = ("DELETE from rooms where name = $1")
+		con.query(sql, roomName)
+			.on('error', console.error); 
+		console.log("room deleted from table");	
+		io.sockets.emit('remove_room', {roomName:roomName});
+	})
+
 	// GET ALL USERS IN A ROOM WHO HAVENT LEFT *if a user closes the tab w/o clicking leave, their name is still in the DB!!
 	socket.on("users_in_room", function(data){
 		var roomName = data["roomName"];

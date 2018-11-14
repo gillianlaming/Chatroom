@@ -105,6 +105,7 @@
         var roomName = data["roomName"]; var creator = data["creator"];
         var btn = document.getElementById("rooms_list").appendChild(document.createElement("button")); //add a button for every room
         btn.appendChild(document.createTextNode(roomName));
+        btn.className = "room_button";
         document.getElementById("rooms_list").appendChild(document.createElement("br"));
 
         var username =  document.getElementById("name").textContent;
@@ -115,12 +116,6 @@
           console.log(username+" is trying to enter "+roomName);
           socketio.emit("is_there_password", {username:username, roomName:roomName, creator:creator});          
         }
-        //   window.addEventListener("unload", function(){ // handles case when user leaves page || reloads page
-        //     console.log("page was reloaded")
-        //     socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //need to pass username
-        //     leaveRoom();
-        //     socketio.emit("users_in_room", {roomName:roomName}); //display all of the current users in the room
-        //     });
         
       });
       socketio.on("ask_for_password", function(data){
@@ -162,9 +157,38 @@
           document.getElementById("room_title").innerHTML = roomName; // show name
           document.getElementById("room_creator").innerHTML = creator;
 
-          socketio.emit("check_delete_room", {username:username, roomName:roomName});
+        if (username == creator){
+          console.log("you created this room, and therefor can delete it");
+          document.getElementById("delete_room").onclick = function(){
+            deleteRoom(roomName);
+          }
+        }
+        else{
+          document.getElementById("delete_room").onclick = function(){
+            alert("you can't delete this room because you did not create it.")
+          }
+        }
       })
-      
+      socketio.on("delete_msg", function(data){
+        roomName = data["roomName"];
+        message = data["message"];
+        alert(message);
+        socketio.emit("remove_user_from_room", {roomName:roomName, username:username}); //remove room attribute from user
+        document.getElementById("theChatroom").style.display = "block";
+        document.getElementById('leave_room').style.visibility = "hidden"; // display leave room btn
+        document.getElementById("delete_room").style.visibility = "hidden";
+        document.getElementById("rooms_header").style.visibility="visible"; // hide header
+        document.getElementById("rooms_list").style.visibility="visible"; // hide room list 
+        document.getElementById("new_room_stuff").style.visibility = "visible"; //can't add a new room when you're still in a room
+        document.getElementById("middle").style.visibility = "hidden"; // show chatroom
+        document.getElementById("right").style.visibility = "hidden"; // show users list
+
+        socketio.emit("check_for_kick", {roomName:roomName, username:username});
+
+      })
+      function deleteRoom(roomName){
+        socketio.emit("delete_room", {roomName:roomName});
+      }
       // Display all the users in a room
       socketio.on("display_users", function(data){
           document.getElementById("users_list").innerHTML=""; // clears previous
@@ -386,6 +410,7 @@
         var username = data["username"];
         var roomName = data["roomName"];
         
+
         if (document.getElementById("room_title").textContent == roomName){
           var usersList = document.getElementsByClassName("user_button");
            
@@ -397,6 +422,20 @@
             }
           }
         }
+      });
+
+      socketio.on("remove_room", function(data){  //remove room button
+        var roomName = data["roomName"];
+        var roomsList = document.getElementsByClassName("room_button");
+           
+          for (var i=0; i<roomsList.length; i++){
+            if (roomsList[i].textContent == roomName){ 
+              console.log("removing "+roomsList[i].textContent);
+              roomsList[i].style.display="none";
+              roomsList[i].parentNode.removeChild(roomsList[i]);
+            }
+          }
+        
       });
 
       socketio.on("username_already_exists", function(data){
