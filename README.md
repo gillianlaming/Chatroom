@@ -1,9 +1,5 @@
 # README #
 
-####Group Members:
-1. Leela Ghaemmaghami 457569
-2. Gillian Laming 457507
-
 #####How to use our chatroom:
 ######Please run `npm install` and `node chat_server.js` then open `localhost:3456`
 
