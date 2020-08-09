@@ -1,7 +1,7 @@
 # README #
 
-#####How to use our chatroom:
-######Please run `npm install` and `node chat_server.js` then open `localhost:3456`
+#### How to use our chatroom:
+##### Please run `npm install` and `node chat_server.js` then open `localhost:3456`
 
 1. First, create a username to enter the chatroom. 
     - Usernames must be unique, so if a user enters a username that already exists, there will be an alert for them to enter a different username.
@@ -25,7 +25,7 @@
     - Users cannot direct message, kick out, or ban themselves. 
 7. If the user closes their tab or leaves the page in some other capacity, they are removed from the room, and their name will no longer appear in the list of users in the room.
 
-######Creative Portion
+### Creative Portion
 1. Delete a room that you created:
     - The first aspect of our creative portion is being able to delete a room if you are the creator of the room. 
     - If you delete a room, you are removed from the room and all of the other users in the room are also removed from the room. 
